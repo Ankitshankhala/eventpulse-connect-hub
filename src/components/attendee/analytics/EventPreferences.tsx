@@ -10,6 +10,28 @@ interface EventPreferencesProps {
   userRsvps: any[];
 }
 
+interface LocationData {
+  type: string;
+  count: number;
+  percentage: number;
+}
+
+interface DayData {
+  day: string;
+  count: number;
+}
+
+interface SizeData {
+  size: string;
+  count: number;
+}
+
+interface TimeData {
+  period: string;
+  count: number;
+  percentage: number;
+}
+
 export const EventPreferences = ({ events, userRsvps }: EventPreferencesProps) => {
   const attendedEvents = events.filter(e => {
     const rsvp = userRsvps.find(r => r.event_id === e.id);
@@ -23,10 +45,10 @@ export const EventPreferences = ({ events, userRsvps }: EventPreferencesProps) =
     return acc;
   }, {} as Record<string, number>);
 
-  const locationData = Object.entries(locationPrefs).map(([type, count]) => ({
+  const locationData: LocationData[] = Object.entries(locationPrefs).map(([type, count]) => ({
     type,
-    count,
-    percentage: attendedEvents.length > 0 ? (count / attendedEvents.length) * 100 : 0
+    count: Number(count),
+    percentage: attendedEvents.length > 0 ? (Number(count) / attendedEvents.length) * 100 : 0
   }));
 
   // Day of week preferences
@@ -36,8 +58,8 @@ export const EventPreferences = ({ events, userRsvps }: EventPreferencesProps) =
     return acc;
   }, {} as Record<string, number>);
 
-  const dayData = Object.entries(dayPrefs)
-    .map(([day, count]) => ({ day, count }))
+  const dayData: DayData[] = Object.entries(dayPrefs)
+    .map(([day, count]) => ({ day, count: Number(count) }))
     .sort((a, b) => b.count - a.count);
 
   // Event size preferences (based on max_attendees)
@@ -50,9 +72,9 @@ export const EventPreferences = ({ events, userRsvps }: EventPreferencesProps) =
     return acc;
   }, {} as Record<string, number>);
 
-  const sizeData = Object.entries(sizePrefs).map(([size, count]) => ({
+  const sizeData: SizeData[] = Object.entries(sizePrefs).map(([size, count]) => ({
     size,
-    count
+    count: Number(count)
   }));
 
   // Time pattern analysis
@@ -66,10 +88,10 @@ export const EventPreferences = ({ events, userRsvps }: EventPreferencesProps) =
     return acc;
   }, {} as Record<string, number>);
 
-  const timeData = Object.entries(timePatterns).map(([period, count]) => ({
+  const timeData: TimeData[] = Object.entries(timePatterns).map(([period, count]) => ({
     period,
-    count,
-    percentage: attendedEvents.length > 0 ? (count / attendedEvents.length) * 100 : 0
+    count: Number(count),
+    percentage: attendedEvents.length > 0 ? (Number(count) / attendedEvents.length) * 100 : 0
   }));
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];

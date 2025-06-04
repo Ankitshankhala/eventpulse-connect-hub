@@ -7,6 +7,17 @@ interface EventHistoryChartProps {
   userRsvps: any[];
 }
 
+interface MonthlyData {
+  month: string;
+  rsvps: number;
+  attended: number;
+}
+
+interface WeeklyData {
+  week: string;
+  events: number;
+}
+
 export const EventHistoryChart = ({ events, userRsvps }: EventHistoryChartProps) => {
   const rsvpedEvents = events.filter(e => userRsvps.find(r => r.event_id === e.id));
   
@@ -28,12 +39,12 @@ export const EventHistoryChart = ({ events, userRsvps }: EventHistoryChartProps)
     }
     
     return acc;
-  }, {} as Record<string, { month: string; rsvps: number; attended: number }>);
+  }, {} as Record<string, MonthlyData>);
 
-  const chartData = Object.values(monthlyData).sort((a, b) => a.month.localeCompare(b.month));
+  const chartData: MonthlyData[] = Object.values(monthlyData).sort((a, b) => a.month.localeCompare(b.month));
 
   // Weekly activity data for the last 12 weeks
-  const weeklyData = [];
+  const weeklyData: WeeklyData[] = [];
   for (let i = 11; i >= 0; i--) {
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - (i * 7));
