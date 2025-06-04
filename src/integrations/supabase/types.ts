@@ -9,6 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      event_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          event_id: string
+          id: string
+          parent_comment_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          event_id: string
+          id?: string
+          parent_comment_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          parent_comment_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_comments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "event_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string | null
@@ -16,6 +61,7 @@ export type Database = {
           description: string | null
           host_id: string | null
           id: string
+          image_url: string | null
           location: string
           max_attendees: number | null
           rsvp_deadline: string
@@ -28,6 +74,7 @@ export type Database = {
           description?: string | null
           host_id?: string | null
           id?: string
+          image_url?: string | null
           location: string
           max_attendees?: number | null
           rsvp_deadline: string
@@ -40,6 +87,7 @@ export type Database = {
           description?: string | null
           host_id?: string | null
           id?: string
+          image_url?: string | null
           location?: string
           max_attendees?: number | null
           rsvp_deadline?: string
@@ -111,6 +159,7 @@ export type Database = {
           id: string
           is_read: boolean
           message: string
+          metadata: Json | null
           title: string
           type: string
           user_id: string
@@ -121,6 +170,7 @@ export type Database = {
           id?: string
           is_read?: boolean
           message: string
+          metadata?: Json | null
           title: string
           type: string
           user_id: string
@@ -131,6 +181,7 @@ export type Database = {
           id?: string
           is_read?: boolean
           message?: string
+          metadata?: Json | null
           title?: string
           type?: string
           user_id?: string
@@ -183,6 +234,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_connections: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
       }
       users: {
         Row: {

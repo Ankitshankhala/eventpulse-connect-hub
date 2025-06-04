@@ -14,6 +14,7 @@ interface EventFormData {
   location: string;
   rsvpDeadline: string;
   maxAttendees: string;
+  imageUrl: string;
 }
 
 export const useEventCreation = (onSuccess: () => void) => {
@@ -29,7 +30,8 @@ export const useEventCreation = (onSuccess: () => void) => {
     timezone: 'UTC',
     location: '',
     rsvpDeadline: '',
-    maxAttendees: ''
+    maxAttendees: '',
+    imageUrl: ''
   });
 
   const createEventMutation = useMutation({
@@ -60,7 +62,8 @@ export const useEventCreation = (onSuccess: () => void) => {
         rsvp_deadline: rsvpDeadline.toISOString(),
         max_attendees: eventData.maxAttendees ? parseInt(eventData.maxAttendees) : null,
         host_id: user.id,
-        status: 'Scheduled'
+        status: 'Scheduled',
+        image_url: eventData.imageUrl || null
       };
 
       console.log('Event payload being sent to Supabase:', eventPayload);
@@ -130,7 +133,8 @@ export const useEventCreation = (onSuccess: () => void) => {
       timezone: 'UTC',
       location: '',
       rsvpDeadline: '',
-      maxAttendees: ''
+      maxAttendees: '',
+      imageUrl: ''
     });
   };
 

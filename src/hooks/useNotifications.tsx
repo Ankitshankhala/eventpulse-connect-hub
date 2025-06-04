@@ -2,35 +2,33 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useEnhancedNotifications } from '@/hooks/useEnhancedNotifications';
 
 export const useNotifications = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { createNotification: createEnhancedNotification } = useEnhancedNotifications();
 
   const createNotification = async (
     userId: string,
     type: string,
     title: string,
     message: string,
-    eventId?: string
+    eventId?: string,
+    metadata?: any
   ) => {
-    const { error } = await supabase
-      .from('notifications')
-      .insert({
-        user_id: userId,
+    try {
+      createEnhancedNotification({
+        userId,
         type,
         title,
         message,
-        event_id: eventId
+        eventId,
+        metadata
       });
-
-    if (error) {
+    } catch (error) {
       console.error('Error creating notification:', error);
-      return;
     }
-
-    // Invalidate notifications query to refresh the list
-    queryClient.invalidateQueries({ queryKey: ['notifications'] });
   };
 
   const markAsRead = async (notificationId: string) => {
@@ -48,6 +46,7 @@ export const useNotifications = () => {
     }
 
     queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    queryClient.invalidateQueries({ queryKey: ['enhanced-notifications'] });
   };
 
   return {

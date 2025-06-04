@@ -6,6 +6,7 @@ import { validateEventForm } from '@/utils/eventValidation';
 import { EventBasicDetails } from './EventBasicDetails';
 import { EventDateTime } from './EventDateTime';
 import { EventSettings } from './EventSettings';
+import { EventImageUpload } from './EventImageUpload';
 
 interface CreateEventModalProps {
   open: boolean;
@@ -44,6 +45,11 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
           <EventBasicDetails
             title={formData.title}
             description={formData.description}
+            onInputChange={handleInputChange}
+          />
+
+          <EventImageUpload
+            imageUrl={formData.imageUrl}
             onInputChange={handleInputChange}
           />
 
