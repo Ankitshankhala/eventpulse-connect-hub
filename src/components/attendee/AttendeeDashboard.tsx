@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,11 +7,13 @@ import { LiveEventAttendee } from './LiveEventAttendee';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useRSVP } from '@/hooks/useRSVP';
 
 export const AttendeeDashboard = () => {
   const { user, signOut } = useAuth();
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showLiveEvent, setShowLiveEvent] = useState(false);
+  const { createRSVP, cancelRSVP, checkInToEvent, loading: rsvpLoading } = useRSVP();
 
   // Fetch all public events (scheduled and live)
   const { data: events = [], isLoading } = useQuery({
@@ -50,27 +51,16 @@ export const AttendeeDashboard = () => {
   });
 
   const handleRSVP = async (eventId: string) => {
-    if (!user) return;
-    
-    try {
-      const { error } = await supabase
-        .from('rsvps')
-        .insert({
-          event_id: eventId,
-          user_id: user.id
-        });
-
-      if (error) throw error;
-      console.log('RSVP successful for event:', eventId);
-      // Refetch data to update UI
-      window.location.reload();
-    } catch (error) {
-      console.error('RSVP error:', error);
-    }
+    await createRSVP(eventId);
   };
 
-  const handleCheckIn = (event: any) => {
+  const handleCancelRSVP = async (eventId: string) => {
+    await cancelRSVP(eventId);
+  };
+
+  const handleCheckIn = async (event: any) => {
     if (event.status === 'Live') {
+      await checkInToEvent(event.id);
       setSelectedEvent(event);
       setShowLiveEvent(true);
     }
@@ -260,26 +250,31 @@ export const AttendeeDashboard = () => {
                         {rsvpStatus === 'not-rsvped' && (
                           <Button 
                             onClick={() => handleRSVP(event.id)}
+                            disabled={rsvpLoading}
                             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                           >
-                            RSVP Now
+                            {rsvpLoading ? 'Processing...' : 'RSVP Now'}
+                          </Button>
+                        )}
+                        
+                        {rsvpStatus === 'confirmed' && !canCheckIn && (
+                          <Button 
+                            onClick={() => handleCancelRSVP(event.id)}
+                            disabled={rsvpLoading}
+                            variant="outline"
+                          >
+                            {rsvpLoading ? 'Processing...' : 'Cancel RSVP'}
                           </Button>
                         )}
                         
                         {canCheckIn && (
                           <Button 
                             onClick={() => handleCheckIn(event)}
+                            disabled={rsvpLoading}
                             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                           >
                             <CheckCircle className="w-4 h-4 mr-2" />
                             Join Live Event
-                          </Button>
-                        )}
-                        
-                        {rsvpStatus === 'confirmed' && !canCheckIn && (
-                          <Button variant="outline" disabled>
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Confirmed
                           </Button>
                         )}
                       </div>

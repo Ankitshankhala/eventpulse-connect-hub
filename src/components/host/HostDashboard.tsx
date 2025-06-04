@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Users, Plus, LogOut } from 'lucide-react';
 import { CreateEventModal } from './CreateEventModal';
 import { LiveEventPanel } from './LiveEventPanel';
+import { RSVPManagement } from './RSVPManagement';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +15,7 @@ export const HostDashboard = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showLivePanel, setShowLivePanel] = useState(false);
+  const [showRSVPManagement, setShowRSVPManagement] = useState(false);
 
   // Fetch user's events
   const { data: events = [], isLoading } = useQuery({
@@ -53,9 +54,11 @@ export const HostDashboard = () => {
   };
 
   const handleManageEvent = (event: any) => {
+    setSelectedEvent(event);
     if (event.status === 'Live') {
-      setSelectedEvent(event);
       setShowLivePanel(true);
+    } else {
+      setShowRSVPManagement(true);
     }
   };
 
@@ -209,7 +212,7 @@ export const HostDashboard = () => {
                       size="sm"
                       onClick={() => handleManageEvent(event)}
                     >
-                      {event.status === 'Live' ? 'Live Control' : 'Manage'}
+                      {event.status === 'Live' ? 'Live Control' : 'Manage RSVPs'}
                     </Button>
                   </div>
                 ))
@@ -230,6 +233,26 @@ export const HostDashboard = () => {
           event={selectedEvent}
           onClose={() => setShowLivePanel(false)}
         />
+      )}
+
+      {showRSVPManagement && selectedEvent && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b flex justify-between items-center">
+              <h2 className="text-xl font-semibold">RSVP Management - {selectedEvent.title}</h2>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowRSVPManagement(false)}
+              >
+                Close
+              </Button>
+            </div>
+            <div className="p-6">
+              <RSVPManagement eventId={selectedEvent.id} />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
