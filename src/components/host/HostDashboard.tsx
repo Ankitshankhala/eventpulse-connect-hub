@@ -12,6 +12,7 @@ import { HostEventsTab } from './HostEventsTab';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useEventStatusTransitions } from '@/hooks/useEventStatusTransitions';
 
 export const HostDashboard = () => {
   const { user } = useAuth();
@@ -19,6 +20,9 @@ export const HostDashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showLivePanel, setShowLivePanel] = useState(false);
   const [showRSVPManagement, setShowRSVPManagement] = useState(false);
+
+  // Enable automatic status transitions
+  useEventStatusTransitions(user?.id);
 
   // Fetch user's events
   const { data: events = [], isLoading } = useQuery({
@@ -38,7 +42,8 @@ export const HostDashboard = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!user
+    enabled: !!user,
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes to sync with status transitions
   });
 
   const handleManageEvent = (event: any) => {

@@ -1,8 +1,10 @@
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Users, Plus } from 'lucide-react';
+import { Calendar, Clock, Users, Plus, Settings } from 'lucide-react';
+import { EventStatusManager } from './EventStatusManager';
 
 interface HostEventsTabProps {
   events: any[];
@@ -11,6 +13,8 @@ interface HostEventsTabProps {
 }
 
 export const HostEventsTab = ({ events, onCreateEvent, onManageEvent }: HostEventsTabProps) => {
+  const [selectedEventForStatus, setSelectedEventForStatus] = useState<any>(null);
+
   const getStatusBadge = (status: string) => {
     if (status === 'Live') {
       return (
@@ -41,6 +45,12 @@ export const HostEventsTab = ({ events, onCreateEvent, onManageEvent }: HostEven
     });
   };
 
+  const handleStatusUpdate = (eventId: string, newStatus: string) => {
+    // This will be handled by the parent component's query refetch
+    // We just need to close the status manager
+    setSelectedEventForStatus(null);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -66,34 +76,56 @@ export const HostEventsTab = ({ events, onCreateEvent, onManageEvent }: HostEven
             </div>
           ) : (
             events.map((event) => (
-              <div key={event.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="font-medium text-gray-900">{event.title}</h3>
-                    {getStatusBadge(event.status)}
+              <div key={event.id} className="space-y-4">
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h3 className="font-medium text-gray-900">{event.title}</h3>
+                      {getStatusBadge(event.status)}
+                    </div>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {formatDate(event.date_time)}
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        {formatTime(event.date_time)}
+                      </div>
+                      <div className="flex items-center">
+                        <Users className="w-4 h-4 mr-1" />
+                        {event.rsvps?.length || 0}/{event.max_attendees || '∞'}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      {formatDate(event.date_time)}
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" />
-                      {formatTime(event.date_time)}
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="w-4 h-4 mr-1" />
-                      {event.rsvps?.length || 0}/{event.max_attendees || '∞'}
-                    </div>
+                  <div className="flex items-center space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedEventForStatus(
+                        selectedEventForStatus?.id === event.id ? null : event
+                      )}
+                    >
+                      <Settings className="w-4 h-4 mr-1" />
+                      Status
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => onManageEvent(event)}
+                    >
+                      {event.status === 'Live' ? 'Live Control' : 'Manage RSVPs'}
+                    </Button>
                   </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => onManageEvent(event)}
-                >
-                  {event.status === 'Live' ? 'Live Control' : 'Manage RSVPs'}
-                </Button>
+
+                {/* Event Status Manager */}
+                {selectedEventForStatus?.id === event.id && (
+                  <EventStatusManager 
+                    event={event}
+                    onStatusUpdate={(newStatus) => handleStatusUpdate(event.id, newStatus)}
+                  />
+                )}
               </div>
             ))
           )}
