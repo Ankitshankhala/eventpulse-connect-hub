@@ -34,33 +34,54 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
 
   const createEventMutation = useMutation({
     mutationFn: async (eventData: typeof formData) => {
-      if (!user) throw new Error('User not authenticated');
+      console.log('Starting event creation with data:', eventData);
+      console.log('Current user:', user);
+
+      if (!user) {
+        console.error('No user found');
+        throw new Error('User not authenticated');
+      }
 
       // Combine date and time into a single datetime
       const dateTime = new Date(`${eventData.date}T${eventData.time}`);
+      console.log('Created dateTime:', dateTime);
+      
       const rsvpDeadline = eventData.rsvpDeadline 
         ? new Date(`${eventData.rsvpDeadline}T23:59:59`)
         : new Date(dateTime.getTime() - 24 * 60 * 60 * 1000); // Default to 1 day before event
 
+      console.log('RSVP deadline:', rsvpDeadline);
+
+      const eventPayload = {
+        title: eventData.title,
+        description: eventData.description || null,
+        date_time: dateTime.toISOString(),
+        location: eventData.location,
+        rsvp_deadline: rsvpDeadline.toISOString(),
+        max_attendees: eventData.maxAttendees ? parseInt(eventData.maxAttendees) : null,
+        host_id: user.id,
+        status: 'Scheduled'
+      };
+
+      console.log('Event payload being sent to Supabase:', eventPayload);
+
       const { data, error } = await supabase
         .from('events')
-        .insert({
-          title: eventData.title,
-          description: eventData.description || null,
-          date_time: dateTime.toISOString(),
-          location: eventData.location,
-          rsvp_deadline: rsvpDeadline.toISOString(),
-          max_attendees: eventData.maxAttendees ? parseInt(eventData.maxAttendees) : null,
-          host_id: user.id,
-          status: 'Scheduled'
-        })
+        .insert(eventPayload)
         .select()
         .single();
 
-      if (error) throw error;
+      console.log('Supabase response - data:', data);
+      console.log('Supabase response - error:', error);
+
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: (data) => {
+      console.log('Event created successfully:', data);
       toast({
         title: "Event Created Successfully!",
         description: `"${data.title}" has been created and is now scheduled.`,
@@ -83,10 +104,23 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
       });
     },
     onError: (error) => {
-      console.error('Error creating event:', error);
+      console.error('Error creating event - full error object:', error);
+      console.error('Error message:', error.message);
+      
+      let errorMessage = "There was a problem creating your event. Please try again.";
+      
+      // Provide more specific error messages based on the error
+      if (error.message.includes('permission')) {
+        errorMessage = "You don't have permission to create events. Please make sure you're logged in as a host.";
+      } else if (error.message.includes('validation')) {
+        errorMessage = "Please check that all required fields are filled out correctly.";
+      } else if (error.message.includes('network')) {
+        errorMessage = "Network error. Please check your internet connection and try again.";
+      }
+      
       toast({
         title: "Error Creating Event",
-        description: "There was a problem creating your event. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -94,6 +128,8 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log('Form submitted with data:', formData);
     
     // Basic validation
     if (!formData.title.trim()) {
@@ -123,6 +159,7 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
       return;
     }
 
+    console.log('Validation passed, calling mutation...');
     createEventMutation.mutate(formData);
   };
 
