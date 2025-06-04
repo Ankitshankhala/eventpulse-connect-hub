@@ -25,6 +25,7 @@ export const useRSVPManagement = (eventId: string) => {
   const { data: rsvps = [], isLoading } = useQuery({
     queryKey: ['event-rsvps', eventId],
     queryFn: async () => {
+      console.log('Fetching RSVPs for event:', eventId);
       const { data, error } = await supabase
         .from('rsvps')
         .select(`
@@ -34,27 +35,39 @@ export const useRSVPManagement = (eventId: string) => {
         .eq('event_id', eventId)
         .order('rsvp_time', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching RSVPs:', error);
+        throw error;
+      }
+      console.log('Fetched RSVPs:', data);
       return (data || []) as RSVPWithUser[];
     }
   });
 
   const approveRSVP = async (rsvpId: string) => {
+    console.log('Approving RSVP:', rsvpId);
     setProcessingRsvp(rsvpId);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('rsvps')
-        .update({ status: 'approved' } as any)
-        .eq('id', rsvpId);
+        .update({ status: 'approved' })
+        .eq('id', rsvpId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Approve RSVP error:', error);
+        throw error;
+      }
+
+      console.log('RSVP approved successfully:', data);
 
       toast({
         title: "RSVP Approved",
         description: "The RSVP has been approved successfully"
       });
 
-      queryClient.invalidateQueries({ queryKey: ['event-rsvps', eventId] });
+      // Invalidate and refetch the query
+      await queryClient.invalidateQueries({ queryKey: ['event-rsvps', eventId] });
     } catch (error) {
       console.error('Approve RSVP error:', error);
       toast({
@@ -68,6 +81,7 @@ export const useRSVPManagement = (eventId: string) => {
   };
 
   const rejectRSVP = async (rsvpId: string) => {
+    console.log('Rejecting RSVP:', rsvpId);
     setProcessingRsvp(rsvpId);
     try {
       const { error } = await supabase
@@ -75,14 +89,20 @@ export const useRSVPManagement = (eventId: string) => {
         .delete()
         .eq('id', rsvpId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Reject RSVP error:', error);
+        throw error;
+      }
+
+      console.log('RSVP rejected successfully');
 
       toast({
         title: "RSVP Rejected",
         description: "The RSVP has been rejected and removed"
       });
 
-      queryClient.invalidateQueries({ queryKey: ['event-rsvps', eventId] });
+      // Invalidate and refetch the query
+      await queryClient.invalidateQueries({ queryKey: ['event-rsvps', eventId] });
     } catch (error) {
       console.error('Reject RSVP error:', error);
       toast({
