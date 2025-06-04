@@ -10,15 +10,32 @@ interface RSVPActionsProps {
 }
 
 export const RSVPActions = ({ rsvpId, isProcessing, onApprove, onReject }: RSVPActionsProps) => {
-  const handleApprove = () => {
+  const handleApprove = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log('Approve button clicked for RSVP:', rsvpId);
+    if (!rsvpId) {
+      console.error('No RSVP ID provided to handleApprove');
+      return;
+    }
     onApprove(rsvpId);
   };
 
-  const handleReject = () => {
+  const handleReject = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log('Reject button clicked for RSVP:', rsvpId);
+    if (!rsvpId) {
+      console.error('No RSVP ID provided to handleReject');
+      return;
+    }
     onReject(rsvpId);
   };
+
+  if (!rsvpId) {
+    console.error('RSVPActions rendered without rsvpId');
+    return null;
+  }
 
   return (
     <div className="flex gap-2">

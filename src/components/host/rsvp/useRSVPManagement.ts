@@ -49,6 +49,16 @@ export const useRSVPManagement = (eventId: string) => {
     console.log('RSVP ID:', rsvpId);
     console.log('Event ID:', eventId);
     
+    if (!rsvpId) {
+      console.error('No RSVP ID provided');
+      toast({
+        title: "Error",
+        description: "Invalid RSVP ID",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setProcessingRsvp(rsvpId);
     
     try {
@@ -61,6 +71,14 @@ export const useRSVPManagement = (eventId: string) => {
 
       if (fetchError) {
         console.error('Error fetching RSVP before update:', fetchError);
+        if (fetchError.code === 'PGRST116') {
+          toast({
+            title: "RSVP Not Found",
+            description: "The RSVP record could not be found",
+            variant: "destructive"
+          });
+          return;
+        }
         throw fetchError;
       }
 
@@ -84,30 +102,39 @@ export const useRSVPManagement = (eventId: string) => {
 
       if (!updatedData || updatedData.length === 0) {
         console.error('No rows were updated');
-        throw new Error('No RSVP was updated');
+        toast({
+          title: "Update Failed",
+          description: "The RSVP could not be updated. Please try again.",
+          variant: "destructive"
+        });
+        return;
       }
 
       console.log('RSVP approved successfully:', updatedData[0]);
 
       toast({
         title: "RSVP Approved",
-        description: `RSVP has been approved successfully for ${existingRsvp.user_id}`
+        description: "The RSVP has been approved successfully"
       });
 
       // Invalidate and refetch the query
       console.log('Invalidating queries for event:', eventId);
       await queryClient.invalidateQueries({ queryKey: ['event-rsvps', eventId] });
       
-      // Force a manual refetch to ensure UI updates
-      await queryClient.refetchQueries({ queryKey: ['event-rsvps', eventId] });
-      
       console.log('=== APPROVE RSVP SUCCESS ===');
-    } catch (error) {
+    } catch (error: any) {
       console.error('=== APPROVE RSVP ERROR ===');
       console.error('Error details:', error);
+      
+      let errorMessage = "There was an error approving the RSVP. Please try again.";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Approval Failed",
-        description: "There was an error approving the RSVP. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -118,6 +145,17 @@ export const useRSVPManagement = (eventId: string) => {
 
   const rejectRSVP = async (rsvpId: string) => {
     console.log('Rejecting RSVP:', rsvpId);
+    
+    if (!rsvpId) {
+      console.error('No RSVP ID provided');
+      toast({
+        title: "Error",
+        description: "Invalid RSVP ID",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setProcessingRsvp(rsvpId);
     try {
       const { error } = await supabase
@@ -139,11 +177,18 @@ export const useRSVPManagement = (eventId: string) => {
 
       // Invalidate and refetch the query
       await queryClient.invalidateQueries({ queryKey: ['event-rsvps', eventId] });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Reject RSVP error:', error);
+      
+      let errorMessage = "There was an error rejecting the RSVP. Please try again.";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Rejection Failed",
-        description: "There was an error rejecting the RSVP. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
