@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { NavBar } from "./components/navigation/NavBar";
 import { ErrorBoundary } from "./components/error/ErrorBoundary";
+import { PerformanceMonitor } from "./components/performance/PerformanceMonitor";
+import { SEOHead } from "./components/seo/SEOHead";
 import { LazyRoute, LazyDiscover, LazyAnalytics, LazyAbout, LazyTerms, LazyPrivacy, LazyContact, LazyNotFound } from "./components/routing/LazyRoutes";
 import Index from "./pages/Index";
 
@@ -21,6 +23,7 @@ const queryClient = new QueryClient({
       },
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
+      refetchOnWindowFocus: false, // Reduce unnecessary requests
     },
     mutations: {
       retry: 1,
@@ -33,6 +36,8 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
+          <PerformanceMonitor />
+          <SEOHead />
           <Toaster />
           <Sonner />
           <BrowserRouter>
