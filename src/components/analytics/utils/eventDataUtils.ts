@@ -92,7 +92,7 @@ export const processEventSizeData = (events: any[], userRsvps: any[]): EventSize
 
   return Object.entries(eventSizeData).map(([size, count]) => ({
     size,
-    count
+    count: count as number
   }));
 };
 
@@ -105,6 +105,6 @@ export const processDayOfWeekData = (events: any[]): DayOfWeekData[] => {
 
   return Object.entries(dayOfWeekData).map(([day, count]) => ({
     day,
-    count
+    count: count as number
   }));
 };
