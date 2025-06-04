@@ -32,7 +32,7 @@ export const AuthSection = ({ onGetStarted }: AuthSectionProps) => {
         <div className="relative">
           <Button
             variant="ghost"
-            className="absolute -top-2 -right-2 z-10 bg-white/90 hover:bg-white"
+            className="absolute -top-2 -right-2 z-10 bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 rounded-full w-8 h-8 p-0"
             onClick={() => setShowAuth(false)}
           >
             ✕
@@ -48,10 +48,10 @@ export const AuthSection = ({ onGetStarted }: AuthSectionProps) => {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in">
+    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in font-segoe">
       <Button 
         size="lg" 
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg"
+        className="bg-ep-blue hover:bg-ep-blue-hover text-white px-8 py-4 text-lg font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl"
         onClick={handleGetStarted}
       >
         Get Started
@@ -59,7 +59,7 @@ export const AuthSection = ({ onGetStarted }: AuthSectionProps) => {
       <Button 
         variant="outline" 
         size="lg" 
-        className="px-8 py-4 text-lg border-gray-300"
+        className="px-8 py-4 text-lg border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200"
         onClick={handleSignIn}
       >
         Sign In

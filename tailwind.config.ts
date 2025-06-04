@@ -19,6 +19,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'segoe': ['Segoe UI', 'system-ui', '-apple-system', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -62,7 +65,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// EventPulse Brand Colors
+				'ep-blue': '#4285F4',
+				'ep-blue-hover': '#3367d6',
+				'ep-blue-light': '#66a3ff',
+				'ep-red': '#EA4335',
+				'ep-red-hover': '#d93025',
+				'ep-yellow': '#F4B400',
+				'ep-yellow-hover': '#f09300',
+				'ep-green': '#34A853',
+				'ep-green-hover': '#2d8e47',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -105,13 +118,22 @@ export default {
 						transform: 'scale(1)',
 						opacity: '1'
 					}
+				},
+				'pulse-live': {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.7'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-				'scale-in': 'scale-in 0.2s ease-out'
+				'scale-in': 'scale-in 0.2s ease-out',
+				'pulse-live': 'pulse-live 1.5s ease-in-out infinite'
 			}
 		}
 	},
