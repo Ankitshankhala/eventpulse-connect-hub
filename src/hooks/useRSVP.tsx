@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications } from '@/hooks/useNotifications';
 import { toast } from '@/hooks/use-toast';
 
 export const useRSVP = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { createNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
 
   const createRSVP = async (eventId: string) => {
@@ -22,6 +24,13 @@ export const useRSVP = () => {
 
     setLoading(true);
     try {
+      // Get event details for notification
+      const { data: event } = await supabase
+        .from('events')
+        .select('title')
+        .eq('id', eventId)
+        .single();
+
       const { error } = await supabase
         .from('rsvps')
         .insert({
@@ -45,6 +54,17 @@ export const useRSVP = () => {
           title: "RSVP Confirmed!",
           description: "You have successfully RSVP'd to this event"
         });
+
+        // Create notification
+        if (event) {
+          await createNotification(
+            user.id,
+            'rsvp_confirmation',
+            'RSVP Confirmed',
+            `You have successfully RSVP'd to "${event.title}"`,
+            eventId
+          );
+        }
         
         // Invalidate queries to refresh data
         queryClient.invalidateQueries({ queryKey: ['user-rsvps'] });

@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export const AttendeeDashboardHeader = () => {
   const { user, signOut } = useAuth();
@@ -18,6 +19,7 @@ export const AttendeeDashboardHeader = () => {
           </div>
           
           <div className="flex items-center space-x-4">
+            <NotificationBell />
             <span className="text-sm text-gray-600">{user?.email}</span>
             <Button variant="outline" size="sm" onClick={signOut}>
               <LogOut className="w-4 h-4 mr-1" />

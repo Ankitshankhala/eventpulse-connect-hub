@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +7,7 @@ import { Calendar, Clock, Users, Plus, LogOut } from 'lucide-react';
 import { CreateEventModal } from './CreateEventModal';
 import { LiveEventPanel } from './LiveEventPanel';
 import { RSVPManagement } from './RSVPManagement';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -99,6 +101,7 @@ export const HostDashboard = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              <NotificationBell />
               <span className="text-sm text-gray-600">{user?.email}</span>
               <Button variant="outline" size="sm" onClick={signOut}>
                 <LogOut className="w-4 h-4 mr-1" />
