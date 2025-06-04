@@ -66,55 +66,104 @@ export const EventHistoryChart = ({ events, userRsvps }: EventHistoryChartProps)
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Monthly Activity</CardTitle>
-          <CardDescription>Your RSVPs and attendance over time</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line 
-                type="monotone" 
-                dataKey="rsvps" 
-                stroke="#3b82f6" 
-                strokeWidth={2}
-                name="RSVPs"
-              />
-              <Line 
-                type="monotone" 
-                dataKey="attended" 
-                stroke="#10b981" 
-                strokeWidth={2}
-                name="Attended"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+    <div className="w-full max-w-full overflow-hidden font-['Segoe_UI']">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="border-0 shadow-lg min-w-0">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold text-gray-900">Monthly Activity</CardTitle>
+            <CardDescription className="text-sm text-gray-600">Your RSVPs and attendance over time</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="w-full h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis 
+                    dataKey="month" 
+                    tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={30}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: '8px',
+                      fontFamily: 'Segoe UI'
+                    }} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="rsvps" 
+                    stroke="#4285F4" 
+                    strokeWidth={3}
+                    name="RSVPs"
+                    dot={{ fill: '#4285F4', strokeWidth: 2, r: 4 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="attended" 
+                    stroke="#34A853" 
+                    strokeWidth={3}
+                    name="Attended"
+                    dot={{ fill: '#34A853', strokeWidth: 2, r: 4 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Weekly Activity</CardTitle>
-          <CardDescription>Events attended in the last 12 weeks</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={weeklyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="week" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="events" fill="#6366f1" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        <Card className="border-0 shadow-lg min-w-0">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold text-gray-900">Weekly Activity</CardTitle>
+            <CardDescription className="text-sm text-gray-600">Events attended in the last 12 weeks</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="w-full h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis 
+                    dataKey="week" 
+                    tick={{ fontSize: 10, fontFamily: 'Segoe UI' }}
+                    axisLine={false}
+                    tickLine={false}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={30}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: '8px',
+                      fontFamily: 'Segoe UI'
+                    }} 
+                  />
+                  <Bar 
+                    dataKey="events" 
+                    fill="#4285F4" 
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
