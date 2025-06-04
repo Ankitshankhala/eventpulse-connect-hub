@@ -1,6 +1,6 @@
 
 import { useAuth } from "@/hooks/useAuth";
-import { LandingPage } from "@/components/landing/LandingPage";
+import LandingPage from "@/components/landing/LandingPage";
 import { HostDashboard } from "@/components/host/HostDashboard";
 import { AttendeeDashboard } from "@/components/attendee/AttendeeDashboard";
 
