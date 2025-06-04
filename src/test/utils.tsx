@@ -31,5 +31,7 @@ const customRender = (
   options?: Omit<RenderOptions, 'wrapper'>,
 ) => render(ui, { wrapper: AllTheProviders, ...options });
 
+// Export everything from @testing-library/react except render
 export * from '@testing-library/react';
+// Export our custom render and additional utilities
 export { customRender as render, screen, fireEvent };
