@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { supabase } from '@/integrations/supabase/client';
 
 interface EventData {
@@ -19,11 +20,13 @@ export const useEventManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
+  const { handleError } = useErrorHandler();
 
   const createEvent = useMutation({
     mutationFn: async (eventData: EventData) => {
       if (!user) throw new Error('User not authenticated');
 
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('events')
         .insert({
@@ -47,16 +50,16 @@ export const useEventManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['host-events'] });
     },
     onError: (error) => {
-      toast({
-        title: "Error Creating Event",
-        description: error.message,
-        variant: "destructive",
-      });
+      handleError(error, 'Failed to create event. Please try again.');
+    },
+    onSettled: () => {
+      setIsLoading(false);
     }
   });
 
   const updateEvent = useMutation({
     mutationFn: async ({ id, ...updates }: EventData & { id: string }) => {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('events')
         .update(updates)
@@ -74,11 +77,18 @@ export const useEventManagement = () => {
         description: "Event has been updated successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+    onError: (error) => {
+      handleError(error, 'Failed to update event. Please try again.');
+    },
+    onSettled: () => {
+      setIsLoading(false);
     }
   });
 
   const deleteEvent = useMutation({
     mutationFn: async (eventId: string) => {
+      setIsLoading(true);
       const { error } = await supabase
         .from('events')
         .delete()
@@ -93,6 +103,12 @@ export const useEventManagement = () => {
         description: "Event has been deleted successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+    onError: (error) => {
+      handleError(error, 'Failed to delete event. Please try again.');
+    },
+    onSettled: () => {
+      setIsLoading(false);
     }
   });
 

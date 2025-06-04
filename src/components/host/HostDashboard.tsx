@@ -9,8 +9,11 @@ import { HostAnalyticsDashboard } from './analytics/HostAnalyticsDashboard';
 import { HostDashboardHeader } from './HostDashboardHeader';
 import { HostOverviewTab } from './HostOverviewTab';
 import { HostEventsTab } from './HostEventsTab';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { supabase } from '@/integrations/supabase/client';
 import { useEventStatusTransitions } from '@/hooks/useEventStatusTransitions';
 
@@ -20,12 +23,13 @@ export const HostDashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showLivePanel, setShowLivePanel] = useState(false);
   const [showRSVPManagement, setShowRSVPManagement] = useState(false);
+  const { handleError, retry } = useErrorHandler();
 
   // Enable automatic status transitions
   useEventStatusTransitions(user?.id);
 
-  // Fetch user's events
-  const { data: events = [], isLoading } = useQuery({
+  // Fetch user's events with better error handling
+  const { data: events = [], isLoading, error, refetch } = useQuery({
     queryKey: ['host-events', user?.id],
     queryFn: async () => {
       if (!user) return [];
@@ -43,7 +47,10 @@ export const HostDashboard = () => {
       return data || [];
     },
     enabled: !!user,
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes to sync with status transitions
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    onError: (error) => {
+      handleError(error as Error, 'Failed to load your events');
+    }
   });
 
   const handleManageEvent = (event: any) => {
@@ -55,10 +62,41 @@ export const HostDashboard = () => {
     }
   };
 
+  const handleRetry = () => {
+    retry();
+    refetch();
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <p>Loading dashboard...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <HostDashboardHeader />
+        <LoadingSpinner 
+          size="lg" 
+          text="Loading your dashboard..." 
+          className="min-h-[50vh]"
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <HostDashboardHeader />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Unable to load dashboard
+            </h2>
+            <p className="text-gray-600 mb-4">
+              There was an error loading your events. Please try again.
+            </p>
+            <Button onClick={handleRetry}>
+              Try Again
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -81,35 +119,45 @@ export const HostDashboard = () => {
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview">
-            <HostOverviewTab events={events} />
-          </TabsContent>
+          <ErrorBoundary>
+            <TabsContent value="overview">
+              <HostOverviewTab events={events} />
+            </TabsContent>
+          </ErrorBoundary>
 
-          <TabsContent value="events">
-            <HostEventsTab 
-              events={events}
-              onCreateEvent={() => setShowCreateModal(true)}
-              onManageEvent={handleManageEvent}
-            />
-          </TabsContent>
+          <ErrorBoundary>
+            <TabsContent value="events">
+              <HostEventsTab 
+                events={events}
+                onCreateEvent={() => setShowCreateModal(true)}
+                onManageEvent={handleManageEvent}
+              />
+            </TabsContent>
+          </ErrorBoundary>
 
-          <TabsContent value="analytics">
-            <HostAnalyticsDashboard events={events} />
-          </TabsContent>
+          <ErrorBoundary>
+            <TabsContent value="analytics">
+              <HostAnalyticsDashboard events={events} />
+            </TabsContent>
+          </ErrorBoundary>
         </Tabs>
       </div>
 
       {/* Modals */}
-      <CreateEventModal 
-        open={showCreateModal} 
-        onClose={() => setShowCreateModal(false)} 
-      />
+      <ErrorBoundary>
+        <CreateEventModal 
+          open={showCreateModal} 
+          onClose={() => setShowCreateModal(false)} 
+        />
+      </ErrorBoundary>
 
       {showLivePanel && selectedEvent && (
-        <LiveEventPanel 
-          event={selectedEvent}
-          onClose={() => setShowLivePanel(false)}
-        />
+        <ErrorBoundary>
+          <LiveEventPanel 
+            event={selectedEvent}
+            onClose={() => setShowLivePanel(false)}
+          />
+        </ErrorBoundary>
       )}
 
       {showRSVPManagement && selectedEvent && (
@@ -126,7 +174,9 @@ export const HostDashboard = () => {
               </Button>
             </div>
             <div className="p-6">
-              <RSVPManagement eventId={selectedEvent.id} />
+              <ErrorBoundary>
+                <RSVPManagement eventId={selectedEvent.id} />
+              </ErrorBoundary>
             </div>
           </div>
         </div>
