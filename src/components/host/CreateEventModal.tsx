@@ -65,6 +65,8 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
             rsvpDeadline={formData.rsvpDeadline}
             maxAttendees={formData.maxAttendees}
             eventDate={formData.date}
+            eventType={formData.eventType}
+            meetingUrl={formData.meetingUrl}
             onInputChange={handleInputChange}
           />
 

@@ -2,7 +2,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Calendar, Clock, MapPin, Users, ExternalLink } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ExternalLink, Video } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRSVP } from '@/hooks/useRSVP';
 import { useQuery } from '@tanstack/react-query';
@@ -77,6 +77,30 @@ export const EventCard = ({ event }: EventCardProps) => {
   const isEventPast = new Date(event.date_time) < new Date();
   const canRSVP = !isEventPast && !isEventFull;
 
+  // Check if this is an online event with a meeting link
+  const isOnlineEvent = event.location && (
+    event.location.includes('http') || 
+    event.location.includes('zoom.us') || 
+    event.location.includes('meet.google.com')
+  );
+
+  const getMeetingLink = () => {
+    if (isOnlineEvent) {
+      const urlMatch = event.location.match(/(https?:\/\/[^\s|]+)/);
+      return urlMatch ? urlMatch[1] : event.location;
+    }
+    return null;
+  };
+
+  const getLocationDisplay = () => {
+    if (isOnlineEvent) {
+      if (event.location.includes('zoom.us')) return 'Virtual Event (Zoom)';
+      if (event.location.includes('meet.google.com')) return 'Virtual Event (Google Meet)';
+      return 'Virtual Event';
+    }
+    return event.location;
+  };
+
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="pb-3">
@@ -101,10 +125,12 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
         
         <div className="flex items-center text-sm text-gray-600">
-          <MapPin className="w-4 h-4 mr-2 text-blue-600" />
-          <span className="truncate">
-            {event.location.includes('http') ? 'Virtual Event' : event.location}
-          </span>
+          {isOnlineEvent ? (
+            <Video className="w-4 h-4 mr-2 text-blue-600" />
+          ) : (
+            <MapPin className="w-4 h-4 mr-2 text-blue-600" />
+          )}
+          <span className="truncate">{getLocationDisplay()}</span>
         </div>
         
         <div className="flex items-center text-sm text-gray-600">
@@ -158,15 +184,15 @@ export const EventCard = ({ event }: EventCardProps) => {
               </Badge>
             )}
 
-            {event.location.includes('http') && (
+            {isOnlineEvent && getMeetingLink() && (userRsvp || event.status === 'Live') && (
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => window.open(event.location, '_blank')}
+                onClick={() => window.open(getMeetingLink(), '_blank')}
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
-                Join Event
+                Join Meeting
               </Button>
             )}
           </div>

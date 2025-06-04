@@ -15,6 +15,8 @@ interface EventFormData {
   rsvpDeadline: string;
   maxAttendees: string;
   imageUrl: string;
+  eventType: string;
+  meetingUrl: string;
 }
 
 export const useEventCreation = (onSuccess: () => void) => {
@@ -31,7 +33,9 @@ export const useEventCreation = (onSuccess: () => void) => {
     location: '',
     rsvpDeadline: '',
     maxAttendees: '',
-    imageUrl: ''
+    imageUrl: '',
+    eventType: 'in-person',
+    meetingUrl: ''
   });
 
   const createEventMutation = useMutation({
@@ -54,11 +58,19 @@ export const useEventCreation = (onSuccess: () => void) => {
 
       console.log('RSVP deadline:', rsvpDeadline);
 
+      // Determine the final location based on event type
+      let finalLocation = eventData.location;
+      if (eventData.eventType === 'online' && eventData.meetingUrl) {
+        finalLocation = eventData.meetingUrl;
+      } else if (eventData.eventType === 'hybrid') {
+        finalLocation = `${eventData.location}${eventData.meetingUrl ? ` | Online: ${eventData.meetingUrl}` : ''}`;
+      }
+
       const eventPayload = {
         title: eventData.title,
         description: eventData.description || null,
         date_time: dateTime.toISOString(),
-        location: eventData.location,
+        location: finalLocation,
         rsvp_deadline: rsvpDeadline.toISOString(),
         max_attendees: eventData.maxAttendees ? parseInt(eventData.maxAttendees) : null,
         host_id: user.id,
@@ -134,7 +146,9 @@ export const useEventCreation = (onSuccess: () => void) => {
       location: '',
       rsvpDeadline: '',
       maxAttendees: '',
-      imageUrl: ''
+      imageUrl: '',
+      eventType: 'in-person',
+      meetingUrl: ''
     });
   };
 
