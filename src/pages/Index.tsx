@@ -4,9 +4,11 @@ import { Login } from '@/components/auth/Login';
 import { Signup } from '@/components/auth/Signup';
 import { HostDashboard } from '@/components/host/HostDashboard';
 import { AttendeeDashboard } from '@/components/attendee/AttendeeDashboard';
+import LandingPage from '@/components/landing/LandingPage';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'login' | 'signup' | 'host-dashboard' | 'attendee-dashboard'>('login');
+  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'signup' | 'host-dashboard' | 'attendee-dashboard'>('landing');
   const [user, setUser] = useState<{ email: string; role: 'host' | 'attendee' } | null>(null);
 
   const handleLogin = (email: string, role: 'host' | 'attendee') => {
@@ -16,8 +18,25 @@ const Index = () => {
 
   const handleLogout = () => {
     setUser(null);
-    setCurrentView('login');
+    setCurrentView('landing');
   };
+
+  if (currentView === 'landing') {
+    return (
+      <div className="relative">
+        <div className="absolute top-4 right-4 z-50">
+          <Button 
+            onClick={() => setCurrentView('login')}
+            variant="outline"
+            className="bg-white/90 backdrop-blur-sm"
+          >
+            Sign In
+          </Button>
+        </div>
+        <LandingPage onGetStarted={() => setCurrentView('login')} />
+      </div>
+    );
+  }
 
   if (user && currentView === 'host-dashboard') {
     return <HostDashboard user={user} onLogout={handleLogout} />;
@@ -44,17 +63,37 @@ const Index = () => {
           </div>
 
           {currentView === 'login' && (
-            <Login 
-              onLogin={handleLogin}
-              onSwitchToSignup={() => setCurrentView('signup')}
-            />
+            <>
+              <Login 
+                onLogin={handleLogin}
+                onSwitchToSignup={() => setCurrentView('signup')}
+              />
+              <div className="text-center mt-4">
+                <button 
+                  onClick={() => setCurrentView('landing')}
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  ← Back to home
+                </button>
+              </div>
+            </>
           )}
 
           {currentView === 'signup' && (
-            <Signup 
-              onSignup={handleLogin}
-              onSwitchToLogin={() => setCurrentView('login')}
-            />
+            <>
+              <Signup 
+                onSignup={handleLogin}
+                onSwitchToLogin={() => setCurrentView('login')}
+              />
+              <div className="text-center mt-4">
+                <button 
+                  onClick={() => setCurrentView('landing')}
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  ← Back to home
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
