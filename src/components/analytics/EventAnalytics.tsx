@@ -9,6 +9,12 @@ interface EventAnalyticsProps {
   feedback?: any[];
 }
 
+interface MonthlyEventData {
+  month: string;
+  events: number;
+  rsvps: number;
+}
+
 export const EventAnalytics = ({ events, userRsvps, feedback = [] }: EventAnalyticsProps) => {
   // Event status distribution
   const eventStatusData = [
@@ -55,7 +61,7 @@ export const EventAnalytics = ({ events, userRsvps, feedback = [] }: EventAnalyt
     acc[monthKey].rsvps += eventRsvps;
     
     return acc;
-  }, {} as Record<string, { month: string; events: number; rsvps: number }>);
+  }, {} as Record<string, MonthlyEventData>);
 
   const monthlyData = Object.values(monthlyEvents).sort((a, b) => a.month.localeCompare(b.month));
 

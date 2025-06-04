@@ -10,6 +10,18 @@ interface UserEngagementProps {
   users?: any[];
 }
 
+interface MonthlyActivity {
+  month: string;
+  rsvps: number;
+  uniqueUsers: Set<string>;
+}
+
+interface ActivityData {
+  month: string;
+  rsvps: number;
+  activeUsers: number;
+}
+
 export const UserEngagement = ({ events, userRsvps, users = [] }: UserEngagementProps) => {
   // User engagement levels
   const userEngagement = users.map(user => {
@@ -69,9 +81,9 @@ export const UserEngagement = ({ events, userRsvps, users = [] }: UserEngagement
     acc[monthKey].uniqueUsers.add(rsvp.user_id);
     
     return acc;
-  }, {} as Record<string, { month: string; rsvps: number; uniqueUsers: Set<string> }>);
+  }, {} as Record<string, MonthlyActivity>);
 
-  const activityData = Object.values(monthlyActivity).map(item => ({
+  const activityData: ActivityData[] = Object.values(monthlyActivity).map(item => ({
     month: item.month,
     rsvps: item.rsvps,
     activeUsers: item.uniqueUsers.size

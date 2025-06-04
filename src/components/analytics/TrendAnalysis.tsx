@@ -9,6 +9,14 @@ interface TrendAnalysisProps {
   feedback?: any[];
 }
 
+interface MonthlyGrowthData {
+  month: string;
+  events: number;
+  rsvps: number;
+  attendance: number;
+  feedback: number;
+}
+
 export const TrendAnalysis = ({ events, userRsvps, feedback = [] }: TrendAnalysisProps) => {
   // Weekly trends for the last 12 weeks
   const weeklyTrends = [];
@@ -93,15 +101,15 @@ export const TrendAnalysis = ({ events, userRsvps, feedback = [] }: TrendAnalysi
     acc[monthKey].feedback += monthFeedback.length;
     
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, MonthlyGrowthData>);
 
-  const monthlyData = Object.values(monthlyGrowth).sort((a: any, b: any) => a.month.localeCompare(b.month));
+  const monthlyData = Object.values(monthlyGrowth).sort((a, b) => a.month.localeCompare(b.month));
 
   // Calculate growth rates
-  const calculateGrowthRate = (data: any[], key: string) => {
+  const calculateGrowthRate = (data: MonthlyGrowthData[], key: keyof MonthlyGrowthData) => {
     if (data.length < 2) return 0;
-    const current = data[data.length - 1][key];
-    const previous = data[data.length - 2][key];
+    const current = Number(data[data.length - 1][key]);
+    const previous = Number(data[data.length - 2][key]);
     if (previous === 0) return current > 0 ? 100 : 0;
     return ((current - previous) / previous) * 100;
   };
