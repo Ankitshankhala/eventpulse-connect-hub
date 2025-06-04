@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { CreateEventModal } from './CreateEventModal';
@@ -47,11 +47,15 @@ export const HostDashboard = () => {
       return data || [];
     },
     enabled: !!user,
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-    onError: (error) => {
+    refetchInterval: 5 * 60 * 1000 // Refetch every 5 minutes
+  });
+
+  // Handle errors using useEffect
+  useEffect(() => {
+    if (error) {
       handleError(error as Error, 'Failed to load your events');
     }
-  });
+  }, [error, handleError]);
 
   const handleManageEvent = (event: any) => {
     setSelectedEvent(event);
