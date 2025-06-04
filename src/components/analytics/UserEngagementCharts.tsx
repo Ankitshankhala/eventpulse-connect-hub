@@ -9,75 +9,124 @@ interface UserEngagementChartsProps {
   activityData: ActivityData[];
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#4285F4', '#34A853', '#F4B400', '#EA4335', '#8b5cf6'];
 
 export const UserEngagementCharts = ({ engagementData, roleData, activityData }: UserEngagementChartsProps) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>User Engagement Levels</CardTitle>
-          <CardDescription>Distribution of user activity</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={engagementData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={120}
-                paddingAngle={5}
-                dataKey="count"
-                label={({ level, count }) => `${level}: ${count}`}
-              >
-                {engagementData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+    <div className="w-full max-w-full overflow-hidden font-['Segoe_UI']">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="border-0 shadow-lg min-w-0">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold text-gray-900">User Engagement Levels</CardTitle>
+            <CardDescription className="text-sm text-gray-600">Distribution of user activity</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="w-full h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                  <Pie
+                    data={engagementData}
+                    cx="50%"
+                    cy="45%"
+                    innerRadius={50}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="count"
+                    label={({ level, count }) => `${level}: ${count}`}
+                  >
+                    {engagementData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: '8px',
+                      fontFamily: 'Segoe UI'
+                    }} 
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>User Role Distribution</CardTitle>
-          <CardDescription>Types of users on the platform</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={roleData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="role" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="count" fill="#6366f1" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        <Card className="border-0 shadow-lg min-w-0">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold text-gray-900">User Role Distribution</CardTitle>
+            <CardDescription className="text-sm text-gray-600">Types of users on the platform</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="w-full h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={roleData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis 
+                    dataKey="role" 
+                    tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={30}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: '8px',
+                      fontFamily: 'Segoe UI'
+                    }} 
+                  />
+                  <Bar dataKey="count" fill="#4285F4" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
 
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle>Monthly User Activity</CardTitle>
-          <CardDescription>RSVPs and active users over time</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={activityData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="rsvps" fill="#3b82f6" name="RSVPs" />
-              <Bar dataKey="activeUsers" fill="#10b981" name="Active Users" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        <Card className="lg:col-span-2 border-0 shadow-lg min-w-0">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold text-gray-900">Monthly User Activity</CardTitle>
+            <CardDescription className="text-sm text-gray-600">RSVPs and active users over time</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="w-full h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={activityData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis 
+                    dataKey="month" 
+                    tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={30}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: '8px',
+                      fontFamily: 'Segoe UI'
+                    }} 
+                  />
+                  <Bar dataKey="rsvps" fill="#4285F4" name="RSVPs" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="activeUsers" fill="#34A853" name="Active Users" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

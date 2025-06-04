@@ -11,7 +11,7 @@ interface TimeAnalyticsProps {
 const chartConfig = {
   attendance: {
     label: "Attendance Rate",
-    color: "#3b82f6",
+    color: "#4285F4",
   },
 };
 
@@ -30,48 +30,53 @@ export const TimeAnalytics = ({ events }: TimeAnalyticsProps) => {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Clock className="w-5 h-5 mr-2 text-blue-600" />
+    <Card className="border-0 shadow-lg min-w-0 font-['Segoe_UI']">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center text-lg font-bold text-gray-900">
+          <Clock className="w-5 h-5 mr-2 text-[#4285F4]" />
           Optimal Event Times
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[200px]">
-          <BarChart data={timeData}>
-            <XAxis 
-              dataKey="time" 
-              tick={{ fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis 
-              tick={{ fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <ChartTooltip 
-              content={<ChartTooltipContent />}
-              cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
-            />
-            <Bar 
-              dataKey="attendance" 
-              fill="var(--color-attendance)" 
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ChartContainer>
+      <CardContent className="p-4">
+        <div className="w-full h-[200px]">
+          <ChartContainer config={chartConfig} className="w-full h-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={timeData} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
+                <XAxis 
+                  dataKey="time" 
+                  tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 11, fontFamily: 'Segoe UI' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={30}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent />}
+                  cursor={{ fill: 'rgba(66, 133, 244, 0.1)' }}
+                />
+                <Bar 
+                  dataKey="attendance" 
+                  fill="var(--color-attendance)" 
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
         
-        <div className="mt-4 p-3 bg-green-50 rounded-lg">
+        <div className="mt-4 p-4 bg-gradient-to-r from-[#34A853]/10 to-green-50 rounded-2xl border border-[#34A853]/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-900">Best Time Slot</p>
-              <p className="text-lg font-bold text-green-600">{bestTime.time}</p>
+              <p className="text-sm font-semibold text-[#34A853]/80 uppercase tracking-wide">Best Time Slot</p>
+              <p className="text-lg font-bold text-[#34A853]">{bestTime.time}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-medium text-green-900">Attendance Rate</p>
-              <p className="text-lg font-bold text-green-600">{bestTime.attendance}%</p>
+              <p className="text-sm font-semibold text-[#34A853]/80 uppercase tracking-wide">Attendance Rate</p>
+              <p className="text-lg font-bold text-[#34A853]">{bestTime.attendance}%</p>
             </div>
           </div>
         </div>
