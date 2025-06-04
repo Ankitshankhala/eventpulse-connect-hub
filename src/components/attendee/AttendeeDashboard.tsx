@@ -4,10 +4,13 @@ import { LiveEventAttendee } from './LiveEventAttendee';
 import { AttendeeDashboardHeader } from './AttendeeDashboardHeader';
 import { EventStatsCards } from './EventStatsCards';
 import { EventsList } from './EventsList';
+import { AttendeeAnalyticsDashboard } from './analytics/AttendeeAnalyticsDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useRSVP } from '@/hooks/useRSVP';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar, BarChart3 } from 'lucide-react';
 
 export const AttendeeDashboard = () => {
   const { user } = useAuth();
@@ -97,22 +100,44 @@ export const AttendeeDashboard = () => {
           <p className="text-gray-600">Discover and join amazing events</p>
         </div>
 
-        {/* Quick Stats */}
-        <EventStatsCards 
-          rsvpedEventsCount={rsvpedEvents.length}
-          liveEventsCount={liveEvents.length}
-          upcomingEventsCount={upcomingEvents.length}
-        />
+        <Tabs defaultValue="events" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="events" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Events
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Analytics
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Events List */}
-        <EventsList 
-          events={events}
-          userRsvps={userRsvps}
-          rsvpLoading={rsvpLoading}
-          onRSVP={handleRSVP}
-          onCancelRSVP={handleCancelRSVP}
-          onCheckIn={handleCheckIn}
-        />
+          <TabsContent value="events" className="space-y-6">
+            {/* Quick Stats */}
+            <EventStatsCards 
+              rsvpedEventsCount={rsvpedEvents.length}
+              liveEventsCount={liveEvents.length}
+              upcomingEventsCount={upcomingEvents.length}
+            />
+
+            {/* Events List */}
+            <EventsList 
+              events={events}
+              userRsvps={userRsvps}
+              rsvpLoading={rsvpLoading}
+              onRSVP={handleRSVP}
+              onCancelRSVP={handleCancelRSVP}
+              onCheckIn={handleCheckIn}
+            />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <AttendeeAnalyticsDashboard 
+              events={events}
+              userRsvps={userRsvps}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Live Event Modal */}
