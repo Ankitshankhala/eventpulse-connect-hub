@@ -33,14 +33,14 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
-    // Enable compression
-    minify: 'terser',
-    terserOptions: {
+    // Enable compression only in production
+    minify: mode === 'production' ? 'terser' : false,
+    terserOptions: mode === 'production' ? {
       compress: {
-        drop_console: mode === 'production',
-        drop_debugger: mode === 'production',
+        drop_console: true,
+        drop_debugger: true,
       },
-    },
+    } : undefined,
     // Set chunk size warning limit
     chunkSizeWarningLimit: 1000,
     // Enable source maps for debugging in production
