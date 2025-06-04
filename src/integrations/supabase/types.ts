@@ -9,7 +9,164 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          created_at: string | null
+          date_time: string
+          description: string | null
+          host_id: string | null
+          id: string
+          location: string
+          max_attendees: number | null
+          rsvp_deadline: string
+          status: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          date_time: string
+          description?: string | null
+          host_id?: string | null
+          id?: string
+          location: string
+          max_attendees?: number | null
+          rsvp_deadline: string
+          status?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          date_time?: string
+          description?: string | null
+          host_id?: string | null
+          id?: string
+          location?: string
+          max_attendees?: number | null
+          rsvp_deadline?: string
+          status?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback: {
+        Row: {
+          comment: string | null
+          emoji: string | null
+          event_id: string | null
+          id: string
+          is_flagged: boolean | null
+          is_pinned: boolean | null
+          timestamp: string | null
+          user_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          emoji?: string | null
+          event_id?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          is_pinned?: boolean | null
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          emoji?: string | null
+          event_id?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          is_pinned?: boolean | null
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rsvps: {
+        Row: {
+          checkin_time: string | null
+          event_id: string | null
+          id: string
+          rsvp_time: string | null
+          user_id: string | null
+        }
+        Insert: {
+          checkin_time?: string | null
+          event_id?: string | null
+          id?: string
+          rsvp_time?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          checkin_time?: string | null
+          event_id?: string | null
+          id?: string
+          rsvp_time?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rsvps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rsvps_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+          role: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id: string
+          name: string
+          role: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+          role?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,26 +1,59 @@
 
-import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { Login } from '@/components/auth/Login';
 import { Signup } from '@/components/auth/Signup';
 import { HostDashboard } from '@/components/host/HostDashboard';
 import { AttendeeDashboard } from '@/components/attendee/AttendeeDashboard';
 import LandingPage from '@/components/landing/LandingPage';
 import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'signup' | 'host-dashboard' | 'attendee-dashboard'>('landing');
-  const [user, setUser] = useState<{ email: string; role: 'host' | 'attendee' } | null>(null);
+  const { user, session, loading } = useAuth();
+  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'signup'>('landing');
+  const [userRole, setUserRole] = useState<'host' | 'attendee' | null>(null);
 
-  const handleLogin = (email: string, role: 'host' | 'attendee') => {
-    setUser({ email, role });
-    setCurrentView(role === 'host' ? 'host-dashboard' : 'attendee-dashboard');
-  };
+  useEffect(() => {
+    if (user && session) {
+      // Fetch user profile to get role
+      const fetchUserProfile = async () => {
+        const { data, error } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (data && !error) {
+          setUserRole(data.role);
+        }
+      };
+      
+      fetchUserProfile();
+    } else {
+      setUserRole(null);
+    }
+  }, [user, session]);
 
-  const handleLogout = () => {
-    setUser(null);
-    setCurrentView('landing');
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-white font-bold text-xl">EP</span>
+          </div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
+  // If user is authenticated, show appropriate dashboard
+  if (user && userRole) {
+    return userRole === 'host' ? <HostDashboard /> : <AttendeeDashboard />;
+  }
+
+  // If not authenticated, show landing/auth pages
   if (currentView === 'landing') {
     return (
       <div className="relative">
@@ -36,14 +69,6 @@ const Index = () => {
         <LandingPage onGetStarted={() => setCurrentView('login')} />
       </div>
     );
-  }
-
-  if (user && currentView === 'host-dashboard') {
-    return <HostDashboard user={user} onLogout={handleLogout} />;
-  }
-
-  if (user && currentView === 'attendee-dashboard') {
-    return <AttendeeDashboard user={user} onLogout={handleLogout} />;
   }
 
   return (
@@ -64,10 +89,7 @@ const Index = () => {
 
           {currentView === 'login' && (
             <>
-              <Login 
-                onLogin={handleLogin}
-                onSwitchToSignup={() => setCurrentView('signup')}
-              />
+              <Login onSwitchToSignup={() => setCurrentView('signup')} />
               <div className="text-center mt-4">
                 <button 
                   onClick={() => setCurrentView('landing')}
@@ -81,10 +103,7 @@ const Index = () => {
 
           {currentView === 'signup' && (
             <>
-              <Signup 
-                onSignup={handleLogin}
-                onSwitchToLogin={() => setCurrentView('login')}
-              />
+              <Signup onSwitchToLogin={() => setCurrentView('login')} />
               <div className="text-center mt-4">
                 <button 
                   onClick={() => setCurrentView('landing')}

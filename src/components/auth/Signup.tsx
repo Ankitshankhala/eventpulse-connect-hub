@@ -5,23 +5,49 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface SignupProps {
-  onSignup: (email: string, role: 'host' | 'attendee') => void;
   onSwitchToLogin: () => void;
 }
 
-export const Signup = ({ onSignup, onSwitchToLogin }: SignupProps) => {
+export const Signup = ({ onSwitchToLogin }: SignupProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [role, setRole] = useState<'host' | 'attendee'>('attendee');
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password && password === confirmPassword) {
-      onSignup(email, role);
+    
+    if (!email || !password || !name) {
+      toast.error('Please fill in all required fields');
+      return;
     }
+    
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await signUp(email, password, name, role);
+    
+    if (error) {
+      toast.error(error.message || 'Failed to create account');
+    } else {
+      toast.success('Account created successfully! Please check your email to verify your account.');
+    }
+    setLoading(false);
   };
 
   return (
@@ -33,6 +59,20 @@ export const Signup = ({ onSignup, onSwitchToLogin }: SignupProps) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
+            <Label htmlFor="name">Full Name</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="Enter your full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -42,6 +82,7 @@ export const Signup = ({ onSignup, onSwitchToLogin }: SignupProps) => {
               onChange={(e) => setEmail(e.target.value)}
               className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
               required
+              disabled={loading}
             />
           </div>
           
@@ -50,11 +91,12 @@ export const Signup = ({ onSignup, onSwitchToLogin }: SignupProps) => {
             <Input
               id="password"
               type="password"
-              placeholder="Create a password"
+              placeholder="Create a password (min 6 characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
               required
+              disabled={loading}
             />
           </div>
 
@@ -68,12 +110,13 @@ export const Signup = ({ onSignup, onSwitchToLogin }: SignupProps) => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
               required
+              disabled={loading}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="role">I want to</Label>
-            <Select value={role} onValueChange={(value: 'host' | 'attendee') => setRole(value)}>
+            <Select value={role} onValueChange={(value: 'host' | 'attendee') => setRole(value)} disabled={loading}>
               <SelectTrigger className="border-gray-200 focus:border-blue-400 focus:ring-blue-400">
                 <SelectValue />
               </SelectTrigger>
@@ -87,8 +130,9 @@ export const Signup = ({ onSignup, onSwitchToLogin }: SignupProps) => {
           <Button 
             type="submit" 
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0"
+            disabled={loading}
           >
-            Create Account
+            {loading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </form>
 
@@ -98,6 +142,7 @@ export const Signup = ({ onSignup, onSwitchToLogin }: SignupProps) => {
             <button
               onClick={onSwitchToLogin}
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              disabled={loading}
             >
               Sign in
             </button>

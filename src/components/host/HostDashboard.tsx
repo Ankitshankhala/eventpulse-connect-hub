@@ -3,56 +3,42 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Users, Plus, Settings, LogOut } from 'lucide-react';
+import { Calendar, Clock, Users, Plus, LogOut } from 'lucide-react';
 import { CreateEventModal } from './CreateEventModal';
 import { LiveEventPanel } from './LiveEventPanel';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-interface HostDashboardProps {
-  user: { email: string; role: 'host' | 'attendee' };
-  onLogout: () => void;
-}
-
-export const HostDashboard = ({ user, onLogout }: HostDashboardProps) => {
+export const HostDashboard = () => {
+  const { user, signOut } = useAuth();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showLivePanel, setShowLivePanel] = useState(false);
 
-  // Mock data
-  const events = [
-    {
-      id: 1,
-      title: 'Product Launch Event',
-      status: 'Scheduled',
-      date: '2024-06-15',
-      time: '14:00',
-      rsvpCount: 24,
-      maxAttendees: 50,
-      isLive: false
-    },
-    {
-      id: 2,
-      title: 'Team Building Workshop',
-      status: 'Live',
-      date: '2024-06-04',
-      time: '10:00',
-      rsvpCount: 12,
-      maxAttendees: 20,
-      isLive: true
-    },
-    {
-      id: 3,
-      title: 'Q4 Strategy Meeting',
-      status: 'Closed',
-      date: '2024-05-28',
-      time: '16:00',
-      rsvpCount: 8,
-      maxAttendees: 15,
-      isLive: false
-    }
-  ];
+  // Fetch user's events
+  const { data: events = [], isLoading } = useQuery({
+    queryKey: ['host-events', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          *,
+          rsvps(count)
+        `)
+        .eq('host_id', user.id)
+        .order('created_at', { ascending: false });
 
-  const getStatusBadge = (status: string, isLive: boolean) => {
-    if (status === 'Live' || isLive) {
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user
+  });
+
+  const getStatusBadge = (status: string) => {
+    if (status === 'Live') {
       return (
         <Badge className="bg-green-100 text-green-800 border-green-200">
           <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
@@ -67,11 +53,34 @@ export const HostDashboard = ({ user, onLogout }: HostDashboardProps) => {
   };
 
   const handleManageEvent = (event: any) => {
-    if (event.isLive || event.status === 'Live') {
+    if (event.status === 'Live') {
       setSelectedEvent(event);
       setShowLivePanel(true);
     }
   };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -87,8 +96,8 @@ export const HostDashboard = ({ user, onLogout }: HostDashboardProps) => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{user.email}</span>
-              <Button variant="outline" size="sm" onClick={onLogout}>
+              <span className="text-sm text-gray-600">{user?.email}</span>
+              <Button variant="outline" size="sm" onClick={signOut}>
                 <LogOut className="w-4 h-4 mr-1" />
                 Logout
               </Button>
@@ -124,7 +133,7 @@ export const HostDashboard = ({ user, onLogout }: HostDashboardProps) => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Live Events</p>
                   <p className="text-2xl font-bold text-green-600">
-                    {events.filter(e => e.isLive || e.status === 'Live').length}
+                    {events.filter(e => e.status === 'Live').length}
                   </p>
                 </div>
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -140,7 +149,7 @@ export const HostDashboard = ({ user, onLogout }: HostDashboardProps) => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total RSVPs</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {events.reduce((sum, event) => sum + event.rsvpCount, 0)}
+                    {events.reduce((sum, event) => sum + (event.rsvps?.length || 0), 0)}
                   </p>
                 </div>
                 <Users className="w-8 h-8 text-indigo-600" />
@@ -168,37 +177,43 @@ export const HostDashboard = ({ user, onLogout }: HostDashboardProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {events.map((event) => (
-                <div key={event.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="font-medium text-gray-900">{event.title}</h3>
-                      {getStatusBadge(event.status, event.isLive)}
-                    </div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {event.date}
-                      </div>
-                      <div className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        {event.time}
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="w-4 h-4 mr-1" />
-                        {event.rsvpCount}/{event.maxAttendees}
-                      </div>
-                    </div>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleManageEvent(event)}
-                  >
-                    {event.isLive || event.status === 'Live' ? 'Live Control' : 'Manage'}
-                  </Button>
+              {events.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No events created yet. Create your first event to get started!</p>
                 </div>
-              ))}
+              ) : (
+                events.map((event) => (
+                  <div key={event.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="font-medium text-gray-900">{event.title}</h3>
+                        {getStatusBadge(event.status)}
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {formatDate(event.date_time)}
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {formatTime(event.date_time)}
+                        </div>
+                        <div className="flex items-center">
+                          <Users className="w-4 h-4 mr-1" />
+                          {event.rsvps?.length || 0}/{event.max_attendees || '∞'}
+                        </div>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleManageEvent(event)}
+                    >
+                      {event.status === 'Live' ? 'Live Control' : 'Manage'}
+                    </Button>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

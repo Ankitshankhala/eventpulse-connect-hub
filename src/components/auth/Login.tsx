@@ -4,23 +4,32 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface LoginProps {
-  onLogin: (email: string, role: 'host' | 'attendee') => void;
   onSwitchToSignup: () => void;
 }
 
-export const Login = ({ onLogin, onSwitchToSignup }: LoginProps) => {
+export const Login = ({ onSwitchToSignup }: LoginProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'host' | 'attendee'>('attendee');
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      onLogin(email, role);
+    if (!email || !password) return;
+
+    setLoading(true);
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      toast.error(error.message || 'Failed to sign in');
+    } else {
+      toast.success('Welcome back!');
     }
+    setLoading(false);
   };
 
   return (
@@ -41,6 +50,7 @@ export const Login = ({ onLogin, onSwitchToSignup }: LoginProps) => {
               onChange={(e) => setEmail(e.target.value)}
               className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
               required
+              disabled={loading}
             />
           </div>
           
@@ -54,27 +64,16 @@ export const Login = ({ onLogin, onSwitchToSignup }: LoginProps) => {
               onChange={(e) => setPassword(e.target.value)}
               className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
               required
+              disabled={loading}
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="role">I'm a</Label>
-            <Select value={role} onValueChange={(value: 'host' | 'attendee') => setRole(value)}>
-              <SelectTrigger className="border-gray-200 focus:border-blue-400 focus:ring-blue-400">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="attendee">Event Attendee</SelectItem>
-                <SelectItem value="host">Event Host</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <Button 
             type="submit" 
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0"
+            disabled={loading}
           >
-            Sign In
+            {loading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
 
@@ -84,6 +83,7 @@ export const Login = ({ onLogin, onSwitchToSignup }: LoginProps) => {
             <button
               onClick={onSwitchToSignup}
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              disabled={loading}
             >
               Sign up
             </button>
