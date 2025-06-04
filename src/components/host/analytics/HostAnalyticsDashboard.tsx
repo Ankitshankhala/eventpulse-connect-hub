@@ -7,29 +7,54 @@ import { AttendanceAnalytics } from './AttendanceAnalytics';
 import { GeographicDistribution } from './GeographicDistribution';
 import { EventComparisonChart } from './EventComparisonChart';
 import { TimeAnalytics } from './TimeAnalytics';
-import { BarChart3, TrendingUp, Users, Clock } from 'lucide-react';
+import { HostEventsSummary } from './HostEventsSummary';
+import { HostFeedbackAnalytics } from './HostFeedbackAnalytics';
+import { BarChart3, TrendingUp, Users, Clock, MessageSquare } from 'lucide-react';
 
 interface HostAnalyticsDashboardProps {
   events: any[];
+  userRsvps?: any[];
+  feedback?: any[];
 }
 
-export const HostAnalyticsDashboard = ({ events }: HostAnalyticsDashboardProps) => {
+export const HostAnalyticsDashboard = ({ 
+  events, 
+  userRsvps = [], 
+  feedback = [] 
+}: HostAnalyticsDashboardProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-6">
         <BarChart3 className="w-6 h-6 text-blue-600" />
-        <h2 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Host Analytics Dashboard</h2>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="engagement">Engagement</TabsTrigger>
-          <TabsTrigger value="attendance">Attendance</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="engagement" className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            Engagement
+          </TabsTrigger>
+          <TabsTrigger value="attendance" className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            Attendance
+          </TabsTrigger>
+          <TabsTrigger value="insights" className="flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            Insights
+          </TabsTrigger>
+          <TabsTrigger value="feedback" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Feedback
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
+          <HostEventsSummary events={events} userRsvps={userRsvps} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <EventPerformanceChart events={events} />
             <AttendanceAnalytics events={events} />
@@ -48,27 +73,35 @@ export const HostAnalyticsDashboard = ({ events }: HostAnalyticsDashboardProps) 
           </div>
         </TabsContent>
 
+        <TabsContent value="feedback" className="space-y-4">
+          <HostFeedbackAnalytics events={events} feedback={feedback} />
+        </TabsContent>
+
         <TabsContent value="insights" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2" />
-                Key Insights
+                Host Performance Insights
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                  <h3 className="font-semibold text-blue-900">Best Performing Event</h3>
-                  <p className="text-blue-800">Your highest attendance rate was 89% for "Tech Innovation Summit"</p>
+                  <h3 className="font-semibold text-blue-900">Total Events Hosted</h3>
+                  <p className="text-blue-800">You've successfully hosted {events.length} events</p>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-400">
-                  <h3 className="font-semibold text-green-900">Engagement Growth</h3>
-                  <p className="text-green-800">Average engagement increased by 23% over the last 3 events</p>
+                  <h3 className="font-semibold text-green-900">Average RSVPs</h3>
+                  <p className="text-green-800">
+                    {events.length > 0 ? Math.round(userRsvps.length / events.length) : 0} RSVPs per event on average
+                  </p>
                 </div>
-                <div className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-400">
-                  <h3 className="font-semibold text-orange-900">Optimal Timing</h3>
-                  <p className="text-orange-800">Events scheduled between 2-4 PM show 15% higher attendance</p>
+                <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+                  <h3 className="font-semibold text-purple-900">Engagement Rate</h3>
+                  <p className="text-purple-800">
+                    {events.length > 0 ? Math.round((feedback.length / events.length) * 100) / 100 : 0} feedback items per event
+                  </p>
                 </div>
               </div>
             </CardContent>
