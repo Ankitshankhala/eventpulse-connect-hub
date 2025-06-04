@@ -63,7 +63,7 @@ export const EventAnalytics = ({ events, userRsvps, feedback = [] }: EventAnalyt
     return acc;
   }, {} as Record<string, MonthlyEventData>);
 
-  const monthlyData = Object.values(monthlyEvents).sort((a, b) => a.month.localeCompare(b.month));
+  const monthlyData = (Object.values(monthlyEvents) as MonthlyEventData[]).sort((a, b) => a.month.localeCompare(b.month));
 
   // Event size analysis
   const eventSizeData = events.reduce((acc, event) => {

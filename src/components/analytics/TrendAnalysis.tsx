@@ -103,7 +103,7 @@ export const TrendAnalysis = ({ events, userRsvps, feedback = [] }: TrendAnalysi
     return acc;
   }, {} as Record<string, MonthlyGrowthData>);
 
-  const monthlyData = Object.values(monthlyGrowth).sort((a, b) => a.month.localeCompare(b.month));
+  const monthlyData = (Object.values(monthlyGrowth) as MonthlyGrowthData[]).sort((a, b) => a.month.localeCompare(b.month));
 
   // Calculate growth rates
   const calculateGrowthRate = (data: MonthlyGrowthData[], key: keyof MonthlyGrowthData) => {
@@ -120,7 +120,7 @@ export const TrendAnalysis = ({ events, userRsvps, feedback = [] }: TrendAnalysi
   const feedbackGrowthRate = calculateGrowthRate(monthlyData, 'feedback');
 
   // Attendance rate trend
-  const attendanceTrend = monthlyData.map((month: any) => ({
+  const attendanceTrend = monthlyData.map((month: MonthlyGrowthData) => ({
     ...month,
     attendanceRate: month.rsvps > 0 ? (month.attendance / month.rsvps) * 100 : 0
   }));

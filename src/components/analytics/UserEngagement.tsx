@@ -83,7 +83,7 @@ export const UserEngagement = ({ events, userRsvps, users = [] }: UserEngagement
     return acc;
   }, {} as Record<string, MonthlyActivity>);
 
-  const activityData: ActivityData[] = Object.values(monthlyActivity).map(item => ({
+  const activityData: ActivityData[] = (Object.values(monthlyActivity) as MonthlyActivity[]).map(item => ({
     month: item.month,
     rsvps: item.rsvps,
     activeUsers: item.uniqueUsers.size
