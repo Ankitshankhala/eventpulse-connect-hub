@@ -44,10 +44,11 @@ export const WalkInManager = ({ eventId, onWalkInAdded }: WalkInManagerProps) =>
       if (existingUser) {
         userId = existingUser.id;
       } else {
-        // Create a temporary user record for walk-ins
+        // Create a user record for walk-ins using upsert to handle conflicts
         const { data: newUser, error: userError } = await supabase
           .from('users')
-          .insert({
+          .upsert({
+            id: crypto.randomUUID(), // Generate a UUID for the user
             email: walkInEmail,
             name: walkInName,
             role: 'attendee'

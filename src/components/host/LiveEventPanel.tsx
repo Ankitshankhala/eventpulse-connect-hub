@@ -18,9 +18,14 @@ interface LiveEventPanelProps {
 
 export const LiveEventPanel = ({ event, onClose }: LiveEventPanelProps) => {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [currentEvent, setCurrentEvent] = useState(event);
 
   const handleWalkInAdded = () => {
     setRefreshKey(prev => prev + 1);
+  };
+
+  const handleStatusUpdate = (newStatus: string) => {
+    setCurrentEvent((prev: any) => ({ ...prev, status: newStatus }));
   };
 
   return (
@@ -30,13 +35,13 @@ export const LiveEventPanel = ({ event, onClose }: LiveEventPanelProps) => {
         <div className="p-6 border-b flex justify-between items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white">
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
-              {event.title}
+              {currentEvent.title}
               <Badge variant="secondary" className="bg-green-500 text-white animate-pulse">
                 Live
               </Badge>
             </h2>
             <p className="text-blue-100">
-              {new Date(event.date_time).toLocaleDateString()} • {event.location}
+              {new Date(currentEvent.date_time).toLocaleDateString()} • {currentEvent.location}
             </p>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/20">
@@ -74,11 +79,11 @@ export const LiveEventPanel = ({ event, onClose }: LiveEventPanelProps) => {
 
             <div className="p-6 space-y-6">
               <TabsContent value="metrics">
-                <LiveMetrics eventId={event.id} key={refreshKey} />
+                <LiveMetrics eventId={currentEvent.id} key={refreshKey} />
               </TabsContent>
 
               <TabsContent value="feedback">
-                <EnhancedLiveFeedback eventId={event.id} isHost={true} />
+                <EnhancedLiveFeedback eventId={currentEvent.id} isHost={true} />
               </TabsContent>
 
               <TabsContent value="attendees">
@@ -87,7 +92,7 @@ export const LiveEventPanel = ({ event, onClose }: LiveEventPanelProps) => {
                     <CardTitle>Attendee Management</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <RSVPManagement eventId={event.id} />
+                    <RSVPManagement eventId={currentEvent.id} />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -95,7 +100,7 @@ export const LiveEventPanel = ({ event, onClose }: LiveEventPanelProps) => {
               <TabsContent value="walkins">
                 <div className="space-y-4">
                   <WalkInManager 
-                    eventId={event.id} 
+                    eventId={currentEvent.id} 
                     onWalkInAdded={handleWalkInAdded}
                   />
                   <Card>
@@ -115,7 +120,7 @@ export const LiveEventPanel = ({ event, onClose }: LiveEventPanelProps) => {
               </TabsContent>
 
               <TabsContent value="settings">
-                <EventStatusManager event={event} />
+                <EventStatusManager event={currentEvent} onStatusUpdate={handleStatusUpdate} />
               </TabsContent>
             </div>
           </Tabs>

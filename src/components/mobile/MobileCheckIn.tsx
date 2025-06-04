@@ -96,7 +96,7 @@ export const MobileCheckIn = ({ eventId }: MobileCheckInProps) => {
   };
 
   const getEventTime = () => {
-    if (!event) return '';
+    if (!event) return { date: '', time: '' };
     const eventDate = new Date(event.date_time);
     return {
       date: eventDate.toLocaleDateString(),

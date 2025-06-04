@@ -1,22 +1,76 @@
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { BarChart3 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LiveMetricsProps {
-  stats: {
-    rsvps: number;
-    checkedIn: number;
-    totalEngagement: number;
-  };
-  analyticsData: {
-    peakAttendance: number;
-    totalMessages: number;
-  };
+  eventId: string;
 }
 
-export const LiveMetrics = ({ stats, analyticsData }: LiveMetricsProps) => {
+export const LiveMetrics = ({ eventId }: LiveMetricsProps) => {
+  const [stats, setStats] = useState({
+    rsvps: 0,
+    checkedIn: 0,
+    totalEngagement: 0
+  });
+  const [analyticsData, setAnalyticsData] = useState({
+    peakAttendance: 0,
+    totalMessages: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        // Fetch RSVP stats
+        const { data: rsvps } = await supabase
+          .from('rsvps')
+          .select('*')
+          .eq('event_id', eventId);
+
+        // Fetch feedback for engagement
+        const { data: feedback } = await supabase
+          .from('feedback')
+          .select('*')
+          .eq('event_id', eventId);
+
+        const rsvpCount = rsvps?.length || 0;
+        const checkedInCount = rsvps?.filter(rsvp => rsvp.checkin_time).length || 0;
+        const feedbackCount = feedback?.length || 0;
+
+        setStats({
+          rsvps: rsvpCount,
+          checkedIn: checkedInCount,
+          totalEngagement: feedbackCount
+        });
+
+        setAnalyticsData({
+          peakAttendance: checkedInCount,
+          totalMessages: feedbackCount
+        });
+      } catch (error) {
+        console.error('Error fetching metrics:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMetrics();
+  }, [eventId]);
+
+  if (isLoading) {
+    return (
+      <Card className="w-full max-w-full border-0 shadow-lg">
+        <CardContent className="p-6">
+          <p>Loading metrics...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const engagementRate = ((stats.totalEngagement / stats.checkedIn) * 100) || 0;
   const attendanceRate = ((stats.checkedIn / stats.rsvps) * 100) || 0;
 
