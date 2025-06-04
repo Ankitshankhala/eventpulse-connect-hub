@@ -41,7 +41,7 @@ export const EventHistoryChart = ({ events, userRsvps }: EventHistoryChartProps)
     return acc;
   }, {} as Record<string, MonthlyData>);
 
-  const chartData: MonthlyData[] = Object.values(monthlyData).sort((a, b) => a.month.localeCompare(b.month));
+  const chartData: MonthlyData[] = (Object.values(monthlyData) as MonthlyData[]).sort((a, b) => a.month.localeCompare(b.month));
 
   // Weekly activity data for the last 12 weeks
   const weeklyData: WeeklyData[] = [];
