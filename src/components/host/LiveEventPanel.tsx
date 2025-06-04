@@ -1,165 +1,126 @@
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { LiveEventHeader } from './LiveEventHeader';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { X, Users, MessageSquare, BarChart3, Settings } from 'lucide-react';
 import { LiveMetrics } from './LiveMetrics';
-import { LiveReactions } from './LiveReactions';
-import { QuickActions } from './QuickActions';
-import { FeedbackFeed } from './FeedbackFeed';
+import { EnhancedLiveFeedback } from '../live/EnhancedLiveFeedback';
+import { WalkInManager } from './WalkInManager';
+import { EventStatusManager } from './EventStatusManager';
+import { RSVPManagement } from './RSVPManagement';
 
 interface LiveEventPanelProps {
   event: any;
   onClose: () => void;
 }
 
-interface FeedbackItem {
-  id: number;
-  user: string;
-  message: string;
-  emoji: string;
-  timestamp: string;
-  pinned: boolean;
-  flagged: boolean;
-  isModerated?: boolean;
-}
-
 export const LiveEventPanel = ({ event, onClose }: LiveEventPanelProps) => {
-  const [feedback, setFeedback] = useState<FeedbackItem[]>([
-    { id: 1, user: 'Alice Johnson', message: 'Great presentation so far! The examples are really helpful.', emoji: '👍', timestamp: '2 min ago', pinned: false, flagged: false },
-    { id: 2, user: 'Bob Smith', message: 'Could you speak a bit louder? Hard to hear in the back.', emoji: '😮', timestamp: '3 min ago', pinned: false, flagged: false },
-    { id: 3, user: 'Carol Davis', message: 'Loving the interactive elements and the real-time demos', emoji: '❤️', timestamp: '5 min ago', pinned: true, flagged: false },
-    { id: 4, user: 'David Wilson', message: 'This is exactly what we needed for our project', emoji: '👍', timestamp: '7 min ago', pinned: false, flagged: false },
-    { id: 5, user: 'Emma Brown', message: 'The slides are amazing! Where can I get them?', emoji: '🔥', timestamp: '8 min ago', pinned: false, flagged: false }
-  ]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const [stats, setStats] = useState({
-    rsvps: 47,
-    checkedIn: 34,
-    totalEngagement: 156,
-    reactions: {
-      thumbsUp: 28,
-      thumbsDown: 3,
-      hearts: 18,
-      surprised: 7,
-      fire: 12,
-      clap: 24
-    }
-  });
-
-  const [analyticsData, setAnalyticsData] = useState({
-    peakAttendance: 34,
-    averageEngagement: 4.8,
-    totalMessages: 23,
-    responseRate: 72
-  });
-
-  // Fetch real feedback from Supabase
-  const { data: realFeedback = [] } = useQuery({
-    queryKey: ['event-feedback', event.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('feedback')
-        .select('*')
-        .eq('event_id', event.id)
-        .order('timestamp', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
-    refetchInterval: 3000
-  });
-
-  // Simulate real-time updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStats(prev => ({
-        ...prev,
-        checkedIn: Math.min(prev.rsvps, prev.checkedIn + Math.floor(Math.random() * 2)),
-        totalEngagement: prev.totalEngagement + Math.floor(Math.random() * 3),
-        reactions: {
-          thumbsUp: prev.reactions.thumbsUp + Math.floor(Math.random() * 2),
-          hearts: prev.reactions.hearts + Math.floor(Math.random() * 2),
-          fire: prev.reactions.fire + Math.floor(Math.random() * 1),
-          clap: prev.reactions.clap + Math.floor(Math.random() * 2),
-          surprised: prev.reactions.surprised + Math.floor(Math.random() * 1),
-          thumbsDown: prev.reactions.thumbsDown + (Math.random() > 0.9 ? 1 : 0)
-        }
-      }));
-
-      // Occasionally add new feedback
-      if (Math.random() > 0.85) {
-        const messages = [
-          'This session is incredibly valuable!',
-          'Can we get the recording later?',
-          'Perfect timing for this topic',
-          'Great Q&A session!',
-          'The examples are so practical'
-        ];
-        const users = ['Sarah Kim', 'Mike Johnson', 'Lisa Chen', 'Tom Wilson'];
-        const emojis = ['👍', '❤️', '🔥', '👏', '😮'];
-        
-        const newFeedback: FeedbackItem = {
-          id: Date.now(),
-          user: users[Math.floor(Math.random() * users.length)],
-          message: messages[Math.floor(Math.random() * messages.length)],
-          emoji: emojis[Math.floor(Math.random() * emojis.length)],
-          timestamp: 'just now',
-          pinned: false,
-          flagged: false
-        };
-        
-        setFeedback(prev => [newFeedback, ...prev.slice(0, 19)]);
-      }
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handlePin = (id: number) => {
-    setFeedback(prev => prev.map(item => 
-      item.id === id ? { ...item, pinned: !item.pinned } : item
-    ));
-  };
-
-  const handleFlag = (id: number) => {
-    setFeedback(prev => prev.map(item => 
-      item.id === id ? { ...item, flagged: !item.flagged } : item
-    ));
-  };
-
-  const handleDelete = (id: number) => {
-    setFeedback(prev => prev.filter(item => item.id !== id));
+  const handleWalkInAdded = () => {
+    setRefreshKey(prev => prev + 1);
   };
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden p-0">
-        <LiveEventHeader event={event} onClose={onClose} />
-
-        <div className="flex-1 overflow-auto">
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 p-6 pt-4">
-            
-            {/* Stats & Analytics Panel */}
-            <div className="xl:col-span-1 space-y-4">
-              <LiveMetrics stats={stats} analyticsData={analyticsData} />
-              <LiveReactions reactions={stats.reactions} />
-              <QuickActions />
-            </div>
-
-            {/* Feedback Management */}
-            <div className="xl:col-span-3">
-              <FeedbackFeed
-                feedback={feedback}
-                onPin={handlePin}
-                onFlag={handleFlag}
-                onDelete={handleDelete}
-              />
-            </div>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="p-6 border-b flex justify-between items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+          <div>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              {event.title}
+              <Badge variant="secondary" className="bg-green-500 text-white animate-pulse">
+                Live
+              </Badge>
+            </h2>
+            <p className="text-blue-100">
+              {new Date(event.date_time).toLocaleDateString()} • {event.location}
+            </p>
           </div>
+          <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/20">
+            <X className="w-5 h-5" />
+          </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+
+        {/* Content */}
+        <div className="flex-1 overflow-auto">
+          <Tabs defaultValue="metrics" className="h-full">
+            <div className="px-6 pt-4">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="metrics" className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" />
+                  Metrics
+                </TabsTrigger>
+                <TabsTrigger value="feedback" className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  Feedback
+                </TabsTrigger>
+                <TabsTrigger value="attendees" className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Attendees
+                </TabsTrigger>
+                <TabsTrigger value="walkins" className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Walk-ins
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="flex items-center gap-2">
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <TabsContent value="metrics">
+                <LiveMetrics eventId={event.id} key={refreshKey} />
+              </TabsContent>
+
+              <TabsContent value="feedback">
+                <EnhancedLiveFeedback eventId={event.id} isHost={true} />
+              </TabsContent>
+
+              <TabsContent value="attendees">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Attendee Management</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <RSVPManagement eventId={event.id} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="walkins">
+                <div className="space-y-4">
+                  <WalkInManager 
+                    eventId={event.id} 
+                    onWalkInAdded={handleWalkInAdded}
+                  />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Walk-in Instructions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm text-gray-600">
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Use this feature to check in attendees who arrive without prior RSVP</li>
+                        <li>Walk-ins will be automatically marked as checked in</li>
+                        <li>Their information will be added to your attendee list</li>
+                        <li>They'll receive a welcome notification if they provide an email</li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="settings">
+                <EventStatusManager event={event} />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+      </div>
+    </div>
   );
 };

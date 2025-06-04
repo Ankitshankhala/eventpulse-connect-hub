@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { supabase } from '@/integrations/supabase/client';
 import { useEventStatusTransitions } from '@/hooks/useEventStatusTransitions';
+import { useAutomatedEmailTriggers } from '@/hooks/useAutomatedEmailTriggers';
 
 export const HostDashboard = () => {
   const { user } = useAuth();
@@ -27,6 +27,9 @@ export const HostDashboard = () => {
 
   // Enable automatic status transitions
   useEventStatusTransitions(user?.id);
+  
+  // Enable automated email triggers
+  useAutomatedEmailTriggers();
 
   // Fetch user's events with better error handling
   const { data: events = [], isLoading, error, refetch } = useQuery({

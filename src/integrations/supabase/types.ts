@@ -9,6 +9,84 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      email_queue: {
+        Row: {
+          attempts: number | null
+          created_at: string
+          error_message: string | null
+          html_content: string
+          id: string
+          recipient_email: string
+          scheduled_for: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_type: string
+          user_id: string
+          variables: Json | null
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string
+          error_message?: string | null
+          html_content: string
+          id?: string
+          recipient_email: string
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          template_type: string
+          user_id: string
+          variables?: Json | null
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string
+          error_message?: string | null
+          html_content?: string
+          id?: string
+          recipient_email?: string
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_type?: string
+          user_id?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          created_at: string
+          html_content: string
+          id: string
+          subject: string
+          template_type: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          created_at?: string
+          html_content: string
+          id?: string
+          subject: string
+          template_type: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          created_at?: string
+          html_content?: string
+          id?: string
+          subject?: string
+          template_type?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       event_comments: {
         Row: {
           comment: string
@@ -288,7 +366,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      queue_email: {
+        Args: {
+          p_user_id: string
+          p_template_type: string
+          p_recipient_email: string
+          p_variables?: Json
+          p_scheduled_for?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
