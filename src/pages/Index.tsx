@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
-  const { user, session, loading } = useAuth();
+  const { user, session, loading, signOut } = useAuth();
   const [currentView, setCurrentView] = useState<'landing' | 'login' | 'signup'>('landing');
   const [userRole, setUserRole] = useState<'host' | 'attendee' | null>(null);
 
@@ -25,7 +25,7 @@ const Index = () => {
           .single();
         
         if (data && !error) {
-          setUserRole(data.role);
+          setUserRole(data.role as 'host' | 'attendee');
         }
       };
       
@@ -34,6 +34,11 @@ const Index = () => {
       setUserRole(null);
     }
   }, [user, session]);
+
+  const handleLogout = async () => {
+    await signOut();
+    setCurrentView('landing');
+  };
 
   if (loading) {
     return (
@@ -50,7 +55,14 @@ const Index = () => {
 
   // If user is authenticated, show appropriate dashboard
   if (user && userRole) {
-    return userRole === 'host' ? <HostDashboard /> : <AttendeeDashboard />;
+    return userRole === 'host' ? (
+      <HostDashboard />
+    ) : (
+      <AttendeeDashboard 
+        user={{ email: user.email || '', role: userRole }}
+        onLogout={handleLogout}
+      />
+    );
   }
 
   // If not authenticated, show landing/auth pages
