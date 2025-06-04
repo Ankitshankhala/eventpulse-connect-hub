@@ -12,11 +12,10 @@ export const Footer = () => {
           </div>
           
           <div className="flex flex-wrap gap-6 text-gray-300">
-            <a href="#about" className="hover:text-ep-blue transition-colors">About</a>
-            <a href="#terms" className="hover:text-ep-blue transition-colors">Terms</a>
-            <a href="#privacy" className="hover:text-ep-blue transition-colors">Privacy</a>
-            <a href="#contact" className="hover:text-ep-blue transition-colors">Contact</a>
-            <a href="#github" className="hover:text-ep-blue transition-colors">GitHub</a>
+            <a href="/about" className="hover:text-ep-blue transition-colors">About</a>
+            <a href="/terms" className="hover:text-ep-blue transition-colors">Terms</a>
+            <a href="/privacy" className="hover:text-ep-blue transition-colors">Privacy</a>
+            <a href="/contact" className="hover:text-ep-blue transition-colors">Contact</a>
           </div>
         </div>
         
