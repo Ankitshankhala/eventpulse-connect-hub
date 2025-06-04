@@ -1,9 +1,9 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Footer } from '@/components/landing/Footer';
 
 const Contact = () => {
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,7 +25,7 @@ const Contact = () => {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
             {/* Contact Form */}
             <Card className="bg-white/80 backdrop-blur-sm">
               <CardContent className="p-8">
@@ -135,6 +135,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

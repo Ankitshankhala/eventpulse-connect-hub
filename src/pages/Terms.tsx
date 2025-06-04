@@ -1,5 +1,6 @@
 
 import { Card, CardContent } from '@/components/ui/card';
+import { Footer } from '@/components/landing/Footer';
 
 const Terms = () => {
   return (
@@ -15,7 +16,7 @@ const Terms = () => {
             </p>
           </div>
 
-          <Card className="bg-white/80 backdrop-blur-sm">
+          <Card className="bg-white/80 backdrop-blur-sm mb-16">
             <CardContent className="p-8 md:p-12">
               <div className="prose prose-lg max-w-none">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Acceptance of Terms</h2>
@@ -77,6 +78,7 @@ const Terms = () => {
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

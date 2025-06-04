@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Target, Award, Heart } from 'lucide-react';
+import { Footer } from '@/components/landing/Footer';
 
 const About = () => {
   const values = [
@@ -29,19 +30,14 @@ const About = () => {
 
   const team = [
     {
-      name: "Sarah Johnson",
+      name: "Chanchal",
       role: "CEO & Founder",
-      description: "Former event organizer with 10+ years experience in corporate events."
+      description: "Former event organizer in corporate events."
     },
     {
-      name: "Michael Chen",
+      name: "Ankit Shankhala",
       role: "CTO",
-      description: "Tech veteran who's built platforms serving millions of users worldwide."
-    },
-    {
-      name: "Emily Davis",
-      role: "Head of Product",
-      description: "UX expert passionate about creating intuitive event management experiences."
+      description: "Tech veteran who's built platforms serving millions of users worldwide and UX expert passionate about creating intuitive event management experiences."
     }
   ];
 
@@ -107,7 +103,7 @@ const About = () => {
         {/* Team Section */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Meet Our Team</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {team.map((member, index) => (
               <Card key={index} className="bg-white/80 backdrop-blur-sm">
                 <CardContent className="p-6 text-center">
@@ -124,7 +120,7 @@ const About = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center">
+        <div className="text-center mb-16">
           <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
             <CardContent className="p-8">
               <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Events?</h2>
@@ -142,6 +138,7 @@ const About = () => {
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
