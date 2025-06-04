@@ -1,7 +1,7 @@
-
 import { ArrowRight, Calendar, Users, MessageSquare, BarChart3, Smartphone, Monitor, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { AuthSection } from './AuthSection';
 
 interface LandingPageProps {
   onGetStarted?: () => void;
@@ -54,19 +54,7 @@ const LandingPage = ({ onGetStarted }: LandingPageProps) => {
               EventPulse revolutionizes event management with live feedback, real-time analytics, and seamless attendee experiences. Perfect for hosts and attendees alike.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg"
-                onClick={onGetStarted}
-              >
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-gray-300">
-                View Demo
-              </Button>
-            </div>
+            <AuthSection onGetStarted={onGetStarted} />
 
             {/* Live Emoji Feedback Illustration */}
             <div className="relative max-w-md mx-auto">
