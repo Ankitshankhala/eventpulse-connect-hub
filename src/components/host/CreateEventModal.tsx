@@ -18,6 +18,10 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
     onClose();
   });
 
+  const [enableAdvancedFeatures, setEnableAdvancedFeatures] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
+  const [price, setPrice] = useState('0');
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -28,6 +32,9 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
 
   const handleClose = () => {
     resetForm();
+    setEnableAdvancedFeatures(false);
+    setIsPaid(false);
+    setPrice('0');
     onClose();
   };
 
@@ -69,6 +76,51 @@ export const CreateEventModal = ({ open, onClose }: CreateEventModalProps) => {
             meetingUrl={formData.meetingUrl}
             onInputChange={handleInputChange}
           />
+
+          {/* Enhanced Features Toggle */}
+          <div className="space-y-4 p-4 border rounded-lg">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="advancedFeatures">Enable Advanced Features</Label>
+              <Switch
+                id="advancedFeatures"
+                checked={enableAdvancedFeatures}
+                onCheckedChange={setEnableAdvancedFeatures}
+              />
+            </div>
+
+            {enableAdvancedFeatures && (
+              <div className="space-y-4">
+                {/* Payment Settings */}
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="isPaid">Paid Event</Label>
+                  <Switch
+                    id="isPaid"
+                    checked={isPaid}
+                    onCheckedChange={setIsPaid}
+                  />
+                </div>
+
+                {isPaid && (
+                  <div className="space-y-2">
+                    <Label htmlFor="price">Event Price (USD)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                )}
+
+                <div className="text-sm text-gray-600">
+                  Advanced features include live feedback, payment processing, and enhanced analytics.
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="flex justify-end space-x-3 pt-4">
             <Button 
