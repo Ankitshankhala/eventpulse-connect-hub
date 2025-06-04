@@ -58,7 +58,7 @@ export const processEngagementLevels = (userEngagement: UserEngagementData[], to
 
   return Object.entries(engagementLevels).map(([level, count]) => ({
     level,
-    count,
+    count: count as number,
     percentage: totalUsers > 0 ? (count / totalUsers) * 100 : 0
   }));
 };
@@ -71,7 +71,7 @@ export const processRoleDistribution = (users: any[]): RoleData[] => {
 
   return Object.entries(roleDistribution).map(([role, count]) => ({
     role: role.charAt(0).toUpperCase() + role.slice(1),
-    count
+    count: count as number
   }));
 };
 
