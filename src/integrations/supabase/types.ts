@@ -202,6 +202,7 @@ export type Database = {
           event_id: string | null
           id: string
           rsvp_time: string | null
+          status: string | null
           user_id: string | null
         }
         Insert: {
@@ -209,6 +210,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           rsvp_time?: string | null
+          status?: string | null
           user_id?: string | null
         }
         Update: {
@@ -216,6 +218,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           rsvp_time?: string | null
+          status?: string | null
           user_id?: string | null
         }
         Relationships: [

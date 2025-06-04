@@ -13,6 +13,19 @@ interface RSVPManagementProps {
   eventId: string;
 }
 
+interface RSVPWithUser {
+  id: string;
+  event_id: string | null;
+  user_id: string | null;
+  rsvp_time: string | null;
+  checkin_time: string | null;
+  status: string | null;
+  users: {
+    name: string;
+    email: string;
+  } | null;
+}
+
 export const RSVPManagement = ({ eventId }: RSVPManagementProps) => {
   const queryClient = useQueryClient();
   const [processingRsvp, setProcessingRsvp] = useState<string | null>(null);
@@ -31,7 +44,7 @@ export const RSVPManagement = ({ eventId }: RSVPManagementProps) => {
         .order('rsvp_time', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as RSVPWithUser[];
     }
   });
 
@@ -40,7 +53,7 @@ export const RSVPManagement = ({ eventId }: RSVPManagementProps) => {
     try {
       const { error } = await supabase
         .from('rsvps')
-        .update({ status: 'approved' })
+        .update({ status: 'approved' } as any)
         .eq('id', rsvpId);
 
       if (error) throw error;
@@ -127,7 +140,7 @@ export const RSVPManagement = ({ eventId }: RSVPManagementProps) => {
   const pendingCount = rsvps.filter(rsvp => !rsvp.status || rsvp.status === 'pending').length;
   const totalRSVPs = rsvps.length;
 
-  const getStatusBadge = (rsvp: any) => {
+  const getStatusBadge = (rsvp: RSVPWithUser) => {
     if (rsvp.checkin_time) {
       return (
         <Badge className="bg-[#34A853]/10 text-[#34A853] border-[#34A853]/20">
