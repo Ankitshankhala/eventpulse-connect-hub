@@ -82,20 +82,37 @@ export const usePaymentIntegration = () => {
         .eq('id', eventId)
         .single();
 
+      // Get user details for notifications
+      const { data: userData } = await supabase
+        .from('users')
+        .select('name')
+        .eq('id', user!.id)
+        .single();
+
       if (event) {
         // Send payment confirmation to attendee
+        const paymentTemplate = templates.paymentConfirmed(event.title, amount, sessionId);
         await sendNotification({
           userId: user!.id,
-          ...templates.paymentConfirmed(event.title, amount, sessionId),
+          type: paymentTemplate.type!,
+          title: paymentTemplate.title!,
+          message: paymentTemplate.message!,
           eventId,
+          metadata: paymentTemplate.metadata,
           deliveryMethod: 'both'
         });
 
         // Notify host of new paid attendee
         if (event.host_id !== user!.id) {
+          const attendeeTemplate = templates.newAttendee(
+            userData?.name || user!.email, 
+            event.title
+          );
           await sendNotification({
             userId: event.host_id,
-            ...templates.newAttendee(user!.name || user!.email, event.title),
+            type: attendeeTemplate.type!,
+            title: attendeeTemplate.title!,
+            message: attendeeTemplate.message!,
             eventId,
             deliveryMethod: 'in_app'
           });

@@ -51,6 +51,10 @@ export const NotificationCenter = () => {
     }));
   };
 
+  const handleMarkAllAsRead = () => {
+    markAllAsRead();
+  };
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
@@ -86,7 +90,7 @@ export const NotificationCenter = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={markAllAsRead}
+                    onClick={handleMarkAllAsRead}
                     className="text-blue-600 hover:text-blue-700"
                   >
                     Mark all read
