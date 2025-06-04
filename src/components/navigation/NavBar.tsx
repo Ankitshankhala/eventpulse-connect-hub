@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Calendar, Users, Search, BarChart3, LogOut, User } from "lucide-react";
+import { Menu, Search, BarChart3, LogOut, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -22,7 +22,7 @@ export const NavBar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: Calendar },
+    { path: '/', label: 'Dashboard', icon: () => <img src="/lovable-uploads/fd7cb2dd-7da2-496e-8703-6659bd50df6d.png" alt="Dashboard" className="w-4 h-4" /> },
     { path: '/discover', label: 'Discover', icon: Search },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
   ];
@@ -37,7 +37,7 @@ export const NavBar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <Calendar className="h-8 w-8 text-blue-600" />
+              <img src="/lovable-uploads/fd7cb2dd-7da2-496e-8703-6659bd50df6d.png" alt="EventHub" className="h-8 w-8" />
               <span className="ml-2 text-xl font-bold text-gray-900">EventHub</span>
             </div>
             <div className="hidden md:ml-6 md:flex md:space-x-8">
