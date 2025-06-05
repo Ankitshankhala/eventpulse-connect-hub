@@ -27,7 +27,7 @@ export const CTASection = ({ onGetStarted }: CTASectionProps) => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="border-white text-white hover:bg-white hover:text-ep-blue px-8 py-4 text-lg transition-colors duration-200"
+              className="border-white text-ep-blue hover:bg-white hover:text-ep-blue px-8 py-4 text-lg transition-colors duration-200"
             >
               Schedule Demo
             </Button>

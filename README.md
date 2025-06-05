@@ -1,73 +1,111 @@
-# Welcome to your Lovable project
+vv🎟️ EventHub – Real-Time Event Management Platform
+EventHub is a full-stack, production-grade platform for creating, managing, and engaging with events in real time. Built with React, Supabase, and modern frontend tools, it provides an enterprise-level experience for both event organizers and attendees.
 
-## Project info
+---
 
-**URL**: https://lovable.dev/projects/dab1feb1-dd16-4de1-b3ca-759534a60eaa
+## 🚀 Features
 
-## How can I edit this code?
+### 🧑‍💼 For Event Hosts
+- Create, edit, and manage events
+- Dashboard with real-time metrics (RSVPs, check-ins)
+- Walk-in registration support
+- Live feedback stream (comments + emojis)
+- Post-event analytics dashboard
+- Automated email notifications
+- Role-based access and event ownership
 
-There are several ways of editing your application.
+### 🙋 For Attendees
+- Event discovery and RSVP
+- Time-gated check-in experience
+- Real-time feedback with reactions
+- Track personal event engagement
+- Event recommendations (based on preferences)
 
-**Use Lovable**
+### 🔄 Shared Features
+- Google OAuth and email/password login
+- Mobile-first responsive design
+- Live updates via Supabase subscriptions
+- Notifications system (mocked)
+- Social features: event sharing & user connections
+- SEO optimized and performance-tuned
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dab1feb1-dd16-4de1-b3ca-759534a60eaa) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🧱 Tech Stack
 
-**Use your preferred IDE**
+### Frontend
+- **React 18 + TypeScript**
+- **Vite** – Fast bundler & dev server
+- **Tailwind CSS**, **Radix UI**, **Shadcn/UI**
+- **TanStack Query** – Server state management
+- **Framer Motion**, **Recharts** – Animations & data viz
+- **React Router**, **React Hook Form**, **Zod**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backend
+- **Supabase** – PostgreSQL + RLS + Auth
+- **Edge Functions** – Serverless backend logic
+- **Google OAuth** – Authentication provider
+- **Real-time subscriptions** – Via Supabase
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Tooling & Testing
+- **ESLint**, **Prettier**
+- **Vitest**, **React Testing Library**
+- **Performance Monitoring** – Lazy loading + caching
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📦 Database Schema
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+| Table         | Purpose                            |
+|---------------|------------------------------------|
+| `users`       | Auth & profile data                |
+| `events`      | Event details & metadata           |
+| `rsvps`       | RSVP & check-in tracking           |
+| `feedback`    | Comments + emoji reactions         |
+| `notifications` | Mocked alert system              |
+| `connections` | User relationships                 |
+| `email_queue` | Email reminders                    |
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## 🔐 Authentication & Authorization
 
-**Edit a file directly in GitHub**
+- Role-based access (Host / Attendee)
+- Supabase Row-Level Security (RLS)
+- Event isolation: Hosts only see their own events
+- Secure check-in & RSVP management
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 📊 Analytics & Reporting
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- RSVP vs Actual Attendance (Bar/Line chart)
+- Top Emoji Reactions (Pie chart)
+- Feedback Trends (Tag Cloud)
+- Walk-in Metrics
+- Personal insights for attendees
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🖥️ UI/UX Design Highlights
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Calendar view of events
+- Blinking "Live" badge
+- Mobile-first check-in and feedback screens
+- Modular and reusable UI components
+- Lazy-loaded routes and error boundaries
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/dab1feb1-dd16-4de1-b3ca-759534a60eaa) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📂 Project Structure
+src/
+│
+├── auth/ # Login, Signup, Role routing
+├── host/ # Host dashboard, Event editor
+├── attendee/ # Attendee dashboard, RSVP
+├── live/ # Live event screen
+├── analytics/ # Reporting & insights
+├── components/ # Reusable UI components
+├── lib/ # Supabase client, helpers
+├── types/ # Shared TypeScript interfaces
+├── hooks/ # Custom React hooks
