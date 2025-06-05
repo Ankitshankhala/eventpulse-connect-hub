@@ -1,7 +1,5 @@
-
 import { useState } from 'react';
 import { LiveEventAttendee } from './LiveEventAttendee';
-import { AttendeeDashboardHeader } from './AttendeeDashboardHeader';
 import { EventStatsCards } from './EventStatsCards';
 import { EventsList } from './EventsList';
 import { AttendeeAnalyticsDashboard } from './analytics/AttendeeAnalyticsDashboard';
@@ -110,8 +108,6 @@ export const AttendeeDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <AttendeeDashboardHeader />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
