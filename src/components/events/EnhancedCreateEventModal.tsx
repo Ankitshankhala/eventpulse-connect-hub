@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { useEventManagement } from '@/hooks/useEventManagement';
+import { useEventCreation } from '@/hooks/useEventCreation';
 import { validateEventForm } from '@/utils/eventValidation';
 
 interface EnhancedCreateEventModalProps {
@@ -32,7 +32,7 @@ interface EventFormData {
 }
 
 export const EnhancedCreateEventModal = ({ open, onClose }: EnhancedCreateEventModalProps) => {
-  const { createEvent, isCreating } = useEventManagement();
+  const { createEvent, isCreating } = useEventCreation(onClose);
   
   const [formData, setFormData] = useState<EventFormData>({
     title: '',
@@ -59,25 +59,22 @@ export const EnhancedCreateEventModal = ({ open, onClose }: EnhancedCreateEventM
     
     if (!validateEventForm(formData)) return;
 
-    // Prepare location based on event type
-    let finalLocation = formData.location;
-    if (formData.eventType === 'virtual' && formData.meetingUrl) {
-      finalLocation = formData.meetingUrl;
-    } else if (formData.eventType === 'hybrid') {
-      finalLocation = `${formData.location}${formData.meetingUrl ? ` | Online: ${formData.meetingUrl}` : ''}`;
-    }
-
+    // Prepare the event data in the format expected by useEventCreation
     const eventData = {
       title: formData.title,
       description: formData.description,
-      date_time: new Date(`${formData.date}T${formData.time}`).toISOString(),
-      location: finalLocation,
-      max_attendees: formData.maxAttendees ? parseInt(formData.maxAttendees) : undefined,
-      image_url: formData.imageUrl || undefined
+      date: formData.date,
+      time: formData.time,
+      timezone: 'UTC',
+      location: formData.location,
+      rsvpDeadline: '', // Can be left empty for default behavior
+      maxAttendees: formData.maxAttendees,
+      imageUrl: formData.imageUrl,
+      eventType: formData.eventType,
+      meetingUrl: formData.meetingUrl
     };
 
     createEvent(eventData);
-    handleClose();
   };
 
   const handleClose = () => {
