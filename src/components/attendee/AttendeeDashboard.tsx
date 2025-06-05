@@ -10,33 +10,49 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useRSVP } from '@/hooks/useRSVP';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, BarChart3 } from 'lucide-react';
+import { Calendar, BarChart3, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { EventDiscovery } from '@/components/discovery/EventDiscovery';
 
 export const AttendeeDashboard = () => {
   const { user } = useAuth();
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showLiveEvent, setShowLiveEvent] = useState(false);
+  const [showDiscovery, setShowDiscovery] = useState(false);
   const { createRSVP, cancelRSVP, checkInToEvent, loading: rsvpLoading } = useRSVP();
 
-  // Fetch all public events (scheduled and live)
-  const { data: events = [], isLoading } = useQuery({
-    queryKey: ['public-events'],
+  // Fetch only events the user has RSVP'd to
+  const { data: myEvents = [], isLoading } = useQuery({
+    queryKey: ['my-events', user?.id],
     queryFn: async () => {
+      if (!user) return [];
+      
       const { data, error } = await supabase
-        .from('events')
+        .from('rsvps')
         .select(`
-          *,
-          rsvps(count)
+          event_id,
+          checkin_time,
+          events!inner(
+            *,
+            rsvps(count)
+          )
         `)
-        .in('status', ['Scheduled', 'Live'])
-        .order('date_time', { ascending: true });
+        .eq('user_id', user.id)
+        .in('events.status', ['Scheduled', 'Live'])
+        .order('events.date_time', { ascending: true });
 
       if (error) throw error;
-      return data || [];
-    }
+      
+      // Transform the data to match the expected format
+      return (data || []).map(rsvp => ({
+        ...rsvp.events,
+        rsvp_status: rsvp.checkin_time ? 'checked-in' : 'confirmed'
+      }));
+    },
+    enabled: !!user
   });
 
-  // Fetch user's RSVPs
+  // Fetch user's RSVPs for the EventsList component
   const { data: userRsvps = [] } = useQuery({
     queryKey: ['user-rsvps', user?.id],
     queryFn: async () => {
@@ -85,9 +101,12 @@ export const AttendeeDashboard = () => {
     return 'not-rsvped';
   };
 
-  const rsvpedEvents = events.filter(e => getRSVPStatus(e.id) !== 'not-rsvped');
-  const liveEvents = events.filter(e => e.status === 'Live');
-  const upcomingEvents = events.filter(e => new Date(e.date_time) > new Date() && e.status !== 'Live');
+  const liveEvents = myEvents.filter(e => e.status === 'Live');
+  const upcomingEvents = myEvents.filter(e => new Date(e.date_time) > new Date() && e.status !== 'Live');
+
+  if (showDiscovery) {
+    return <EventDiscovery />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -95,16 +114,25 @@ export const AttendeeDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Events</h1>
-          <p className="text-gray-600">Discover and join amazing events</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Events</h1>
+            <p className="text-gray-600">Your registered events and activities</p>
+          </div>
+          <Button 
+            onClick={() => setShowDiscovery(true)}
+            className="flex items-center gap-2"
+          >
+            <Search className="w-4 h-4" />
+            Discover New Events
+          </Button>
         </div>
 
         <Tabs defaultValue="events" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="events" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              Events
+              My Events
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
@@ -115,14 +143,14 @@ export const AttendeeDashboard = () => {
           <TabsContent value="events" className="space-y-6">
             {/* Quick Stats */}
             <EventStatsCards 
-              rsvpedEventsCount={rsvpedEvents.length}
+              rsvpedEventsCount={myEvents.length}
               liveEventsCount={liveEvents.length}
               upcomingEventsCount={upcomingEvents.length}
             />
 
             {/* Events List */}
             <EventsList 
-              events={events}
+              events={myEvents}
               userRsvps={userRsvps}
               rsvpLoading={rsvpLoading}
               onRSVP={handleRSVP}
@@ -133,7 +161,7 @@ export const AttendeeDashboard = () => {
 
           <TabsContent value="analytics">
             <AttendeeAnalyticsDashboard 
-              events={events}
+              events={myEvents}
               userRsvps={userRsvps}
             />
           </TabsContent>

@@ -1,124 +1,142 @@
 
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-
-interface EventData {
-  title: string;
-  description: string;
-  date_time: string;
-  location: string;
-  max_attendees?: number;
-  image_url?: string;
-}
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/hooks/use-toast';
 
 export const useEventManagement = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isLoading, setIsLoading] = useState(false);
-  const { handleError } = useErrorHandler();
+  const [loading, setLoading] = useState(false);
 
-  const createEvent = useMutation({
-    mutationFn: async (eventData: EventData) => {
-      if (!user) throw new Error('User not authenticated');
+  const updateEvent = async (eventId: string, updates: any) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to update events",
+        variant: "destructive"
+      });
+      return { error: new Error("Authentication required") };
+    }
 
-      setIsLoading(true);
-      const { data, error } = await supabase
+    setLoading(true);
+    try {
+      // First check if user is the host of this event
+      const { data: event, error: fetchError } = await supabase
         .from('events')
-        .insert({
-          ...eventData,
-          host_id: user.id,
-          status: 'Scheduled',
-          rsvp_deadline: new Date(new Date(eventData.date_time).getTime() - 24 * 60 * 60 * 1000).toISOString()
-        })
-        .select()
+        .select('host_id')
+        .eq('id', eventId)
         .single();
 
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Event Created Successfully!",
-        description: `"${data.title}" has been created and is now scheduled.`,
-      });
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-      queryClient.invalidateQueries({ queryKey: ['host-events'] });
-    },
-    onError: (error) => {
-      handleError(error, 'Failed to create event. Please try again.');
-    },
-    onSettled: () => {
-      setIsLoading(false);
-    }
-  });
+      if (fetchError) throw fetchError;
 
-  const updateEvent = useMutation({
-    mutationFn: async ({ id, ...updates }: EventData & { id: string }) => {
-      setIsLoading(true);
-      const { data, error } = await supabase
+      if (event.host_id !== user.id) {
+        toast({
+          title: "Unauthorized",
+          description: "You can only modify your own events",
+          variant: "destructive"
+        });
+        return { error: new Error("Unauthorized: You can only modify your own events") };
+      }
+
+      // Update the event
+      const { error } = await supabase
         .from('events')
         .update(updates)
-        .eq('id', id)
-        .eq('host_id', user?.id)
-        .select()
-        .single();
+        .eq('id', eventId)
+        .eq('host_id', user.id); // Double check authorization
 
       if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
+
       toast({
         title: "Event Updated",
-        description: "Event has been updated successfully.",
+        description: "Your event has been successfully updated"
       });
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-    },
-    onError: (error) => {
-      handleError(error, 'Failed to update event. Please try again.');
-    },
-    onSettled: () => {
-      setIsLoading(false);
-    }
-  });
 
-  const deleteEvent = useMutation({
-    mutationFn: async (eventId: string) => {
-      setIsLoading(true);
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['host-events'] });
+      queryClient.invalidateQueries({ queryKey: ['public-events'] });
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Update event error:', error);
+      toast({
+        title: "Update Failed",
+        description: "There was an error updating your event. Please try again.",
+        variant: "destructive"
+      });
+      return { error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteEvent = async (eventId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to delete events",
+        variant: "destructive"
+      });
+      return { error: new Error("Authentication required") };
+    }
+
+    setLoading(true);
+    try {
+      // First check if user is the host of this event
+      const { data: event, error: fetchError } = await supabase
+        .from('events')
+        .select('host_id')
+        .eq('id', eventId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      if (event.host_id !== user.id) {
+        toast({
+          title: "Unauthorized",
+          description: "You can only delete your own events",
+          variant: "destructive"
+        });
+        return { error: new Error("Unauthorized: You can only delete your own events") };
+      }
+
+      // Delete the event
       const { error } = await supabase
         .from('events')
         .delete()
         .eq('id', eventId)
-        .eq('host_id', user?.id);
+        .eq('host_id', user.id); // Double check authorization
 
       if (error) throw error;
-    },
-    onSuccess: () => {
+
       toast({
         title: "Event Deleted",
-        description: "Event has been deleted successfully.",
+        description: "Your event has been successfully deleted"
       });
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-    },
-    onError: (error) => {
-      handleError(error, 'Failed to delete event. Please try again.');
-    },
-    onSettled: () => {
-      setIsLoading(false);
+
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['host-events'] });
+      queryClient.invalidateQueries({ queryKey: ['public-events'] });
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Delete event error:', error);
+      toast({
+        title: "Delete Failed",
+        description: "There was an error deleting your event. Please try again.",
+        variant: "destructive"
+      });
+      return { error };
+    } finally {
+      setLoading(false);
     }
-  });
+  };
 
   return {
-    createEvent: createEvent.mutate,
-    updateEvent: updateEvent.mutate,
-    deleteEvent: deleteEvent.mutate,
-    isCreating: createEvent.isPending,
-    isUpdating: updateEvent.isPending,
-    isDeleting: deleteEvent.isPending,
-    isLoading
+    updateEvent,
+    deleteEvent,
+    loading
   };
 };
