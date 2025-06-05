@@ -114,18 +114,22 @@ export const AttendeeDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Events</h1>
-            <p className="text-gray-600">Your registered events and activities</p>
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">My Events</h1>
+              <p className="text-gray-600">Your registered events and activities</p>
+            </div>
+            <div className="flex-shrink-0">
+              <Button 
+                onClick={() => setShowDiscovery(true)}
+                className="flex items-center gap-2 w-full sm:w-auto"
+              >
+                <Search className="w-4 h-4" />
+                <span className="whitespace-nowrap">Discover New Events</span>
+              </Button>
+            </div>
           </div>
-          <Button 
-            onClick={() => setShowDiscovery(true)}
-            className="flex items-center gap-2"
-          >
-            <Search className="w-4 h-4" />
-            Discover New Events
-          </Button>
         </div>
 
         <Tabs defaultValue="events" className="space-y-6">
