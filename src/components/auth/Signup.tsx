@@ -63,18 +63,18 @@ export const Signup = ({ onSwitchToLogin }: SignupProps) => {
   };
 
   return (
-    <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl animate-scale-in">
-      <CardHeader className="text-center">
+    <Card className="backdrop-blur-sm bg-white/95 border-0 shadow-xl w-full">
+      <CardHeader className="text-center pb-4">
         <CardTitle className="text-2xl">Create account</CardTitle>
         <CardDescription>Join EventPulse to start managing events</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div className="space-y-4">
           <Button 
             onClick={handleGoogleSignUp}
             disabled={googleLoading || loading}
             variant="outline"
-            className="w-full flex items-center justify-center gap-2 py-6"
+            className="w-full flex items-center justify-center gap-2 py-3"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -94,67 +94,67 @@ export const Signup = ({ onSwitchToLogin }: SignupProps) => {
             </div>
           </div>
 
-          <form onSubmit={handleEmailSignUp} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+          <form onSubmit={handleEmailSignUp} className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="name" className="text-sm">Full Name</Label>
               <Input
                 id="name"
                 type="text"
                 placeholder="Enter your full name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                className="border-gray-200 focus:border-blue-400 focus:ring-blue-400 h-10"
                 required
                 disabled={loading || googleLoading}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-sm">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                className="border-gray-200 focus:border-blue-400 focus:ring-blue-400 h-10"
                 required
                 disabled={loading || googleLoading}
               />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+            <div className="space-y-1">
+              <Label htmlFor="password" className="text-sm">Password</Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Create a password (min 6 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                className="border-gray-200 focus:border-blue-400 focus:ring-blue-400 h-10"
                 required
                 disabled={loading || googleLoading}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="space-y-1">
+              <Label htmlFor="confirmPassword" className="text-sm">Confirm Password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                className="border-gray-200 focus:border-blue-400 focus:ring-blue-400 h-10"
                 required
                 disabled={loading || googleLoading}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="role">I want to</Label>
+            <div className="space-y-1">
+              <Label htmlFor="role" className="text-sm">I want to</Label>
               <Select value={role} onValueChange={(value: 'host' | 'attendee') => setRole(value)} disabled={loading || googleLoading}>
-                <SelectTrigger className="border-gray-200 focus:border-blue-400 focus:ring-blue-400">
+                <SelectTrigger className="border-gray-200 focus:border-blue-400 focus:ring-blue-400 h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,7 +166,7 @@ export const Signup = ({ onSwitchToLogin }: SignupProps) => {
 
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 h-10"
               disabled={loading || googleLoading}
             >
               {loading ? 'Creating Account...' : 'Create Account'}
@@ -174,7 +174,7 @@ export const Signup = ({ onSwitchToLogin }: SignupProps) => {
           </form>
         </div>
 
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{' '}
             <button

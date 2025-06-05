@@ -29,19 +29,21 @@ export const AuthSection = ({ onGetStarted }: AuthSectionProps) => {
   if (showAuth) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="relative">
+        <div className="relative w-full max-w-md max-h-[90vh] overflow-hidden">
           <Button
             variant="ghost"
-            className="absolute -top-2 -right-2 z-10 bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 rounded-full w-8 h-8 p-0"
+            className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 rounded-full w-8 h-8 p-0 shadow-md"
             onClick={() => setShowAuth(false)}
           >
             ✕
           </Button>
-          {authMode === 'login' ? (
-            <Login onSwitchToSignup={switchToSignup} />
-          ) : (
-            <Signup onSwitchToLogin={switchToLogin} />
-          )}
+          <div className="overflow-y-auto max-h-[90vh]">
+            {authMode === 'login' ? (
+              <Login onSwitchToSignup={switchToSignup} />
+            ) : (
+              <Signup onSwitchToLogin={switchToLogin} />
+            )}
+          </div>
         </div>
       </div>
     );
