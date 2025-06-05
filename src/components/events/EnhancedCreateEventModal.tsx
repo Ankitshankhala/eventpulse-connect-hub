@@ -5,10 +5,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { useEventCreation } from '@/hooks/useEventCreation';
 import { validateEventForm } from '@/utils/eventValidation';
+import { EventTypeSection } from './EventTypeSection';
+import { EventPaymentSection } from './EventPaymentSection';
+import { EventAdvancedSection } from './EventAdvancedSection';
 
 interface EnhancedCreateEventModalProps {
   open: boolean;
@@ -120,19 +121,12 @@ export const EnhancedCreateEventModal = ({ open, onClose }: EnhancedCreateEventM
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="eventType">Event Type</Label>
-              <Select value={formData.eventType} onValueChange={(value) => handleInputChange('eventType', value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="in-person">In-Person</SelectItem>
-                  <SelectItem value="virtual">Virtual</SelectItem>
-                  <SelectItem value="hybrid">Hybrid</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <EventTypeSection
+              eventType={formData.eventType}
+              location={formData.location}
+              meetingUrl={formData.meetingUrl}
+              onInputChange={handleInputChange}
+            />
           </div>
 
           <div className="space-y-2">
@@ -171,33 +165,6 @@ export const EnhancedCreateEventModal = ({ open, onClose }: EnhancedCreateEventM
             </div>
           </div>
 
-          {/* Location and Meeting URL */}
-          <div className="space-y-4">
-            {(formData.eventType === 'in-person' || formData.eventType === 'hybrid') && (
-              <div className="space-y-2">
-                <Label htmlFor="location">Venue Location</Label>
-                <Input
-                  id="location"
-                  placeholder="Enter venue address"
-                  value={formData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                />
-              </div>
-            )}
-
-            {(formData.eventType === 'virtual' || formData.eventType === 'hybrid') && (
-              <div className="space-y-2">
-                <Label htmlFor="meetingUrl">Meeting URL</Label>
-                <Input
-                  id="meetingUrl"
-                  placeholder="https://zoom.us/j/..."
-                  value={formData.meetingUrl}
-                  onChange={(e) => handleInputChange('meetingUrl', e.target.value)}
-                />
-              </div>
-            )}
-          </div>
-
           {/* Settings */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -224,59 +191,18 @@ export const EnhancedCreateEventModal = ({ open, onClose }: EnhancedCreateEventM
           </div>
 
           {/* Payment Settings */}
-          <div className="space-y-4 p-4 border rounded-lg">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="isPaid">Paid Event</Label>
-              <Switch
-                id="isPaid"
-                checked={formData.isPaid}
-                onCheckedChange={(checked) => handleInputChange('isPaid', checked)}
-              />
-            </div>
-
-            {formData.isPaid && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="price">Price</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select value={formData.currency} onValueChange={(value) => handleInputChange('currency', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="usd">USD</SelectItem>
-                      <SelectItem value="eur">EUR</SelectItem>
-                      <SelectItem value="gbp">GBP</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-          </div>
+          <EventPaymentSection
+            isPaid={formData.isPaid}
+            price={formData.price}
+            currency={formData.currency}
+            onInputChange={handleInputChange}
+          />
 
           {/* Advanced Features */}
-          <div className="space-y-4 p-4 border rounded-lg">
-            <h4 className="font-medium">Advanced Features</h4>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="enableLiveFeedback">Enable Live Feedback</Label>
-              <Switch
-                id="enableLiveFeedback"
-                checked={formData.enableLiveFeedback}
-                onCheckedChange={(checked) => handleInputChange('enableLiveFeedback', checked)}
-              />
-            </div>
-          </div>
+          <EventAdvancedSection
+            enableLiveFeedback={formData.enableLiveFeedback}
+            onInputChange={handleInputChange}
+          />
 
           <div className="flex justify-end space-x-3 pt-4">
             <Button 
