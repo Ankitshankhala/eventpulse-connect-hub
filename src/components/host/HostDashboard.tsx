@@ -6,7 +6,6 @@ import { CreateEventModal } from './CreateEventModal';
 import { LiveEventPanel } from './LiveEventPanel';
 import { RSVPManagement } from './RSVPManagement';
 import { HostAnalyticsDashboard } from './analytics/HostAnalyticsDashboard';
-import { HostDashboardHeader } from './HostDashboardHeader';
 import { HostOverviewTab } from './HostOverviewTab';
 import { HostEventsTab } from './HostEventsTab';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -78,7 +77,6 @@ export const HostDashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        <HostDashboardHeader />
         <LoadingSpinner 
           size="lg" 
           text="Loading your dashboard..." 
@@ -91,7 +89,6 @@ export const HostDashboard = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        <HostDashboardHeader />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -111,8 +108,6 @@ export const HostDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <HostDashboardHeader />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
