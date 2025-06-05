@@ -9,7 +9,6 @@ import { ErrorBoundary } from "./components/error/ErrorBoundary";
 import { PerformanceMonitor } from "./components/performance/PerformanceMonitor";
 import { SEOHead } from "./components/seo/SEOHead";
 import { LazyRoute, LazyDiscover, LazyAnalytics, LazyAbout, LazyTerms, LazyPrivacy, LazyContact, LazyNotFound } from "./components/routing/LazyRoutes";
-import { useAuth } from "./hooks/useAuth";
 import Index from "./pages/Index";
 
 const queryClient = new QueryClient({
@@ -32,61 +31,6 @@ const queryClient = new QueryClient({
   },
 });
 
-function AppContent() {
-  const { user } = useAuth();
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Only show NavBar when user is not logged in */}
-      {!user && (
-        <ErrorBoundary>
-          <NavBar />
-        </ErrorBoundary>
-      )}
-      <ErrorBoundary>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/discover" element={
-            <LazyRoute>
-              <LazyDiscover />
-            </LazyRoute>
-          } />
-          <Route path="/analytics" element={
-            <LazyRoute>
-              <LazyAnalytics />
-            </LazyRoute>
-          } />
-          <Route path="/about" element={
-            <LazyRoute>
-              <LazyAbout />
-            </LazyRoute>
-          } />
-          <Route path="/terms" element={
-            <LazyRoute>
-              <LazyTerms />
-            </LazyRoute>
-          } />
-          <Route path="/privacy" element={
-            <LazyRoute>
-              <LazyPrivacy />
-            </LazyRoute>
-          } />
-          <Route path="/contact" element={
-            <LazyRoute>
-              <LazyContact />
-            </LazyRoute>
-          } />
-          <Route path="*" element={
-            <LazyRoute>
-              <LazyNotFound />
-            </LazyRoute>
-          } />
-        </Routes>
-      </ErrorBoundary>
-    </div>
-  );
-}
-
 function App() {
   return (
     <ErrorBoundary>
@@ -97,7 +41,51 @@ function App() {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <AppContent />
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+              <ErrorBoundary>
+                <NavBar />
+              </ErrorBoundary>
+              <ErrorBoundary>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/discover" element={
+                    <LazyRoute>
+                      <LazyDiscover />
+                    </LazyRoute>
+                  } />
+                  <Route path="/analytics" element={
+                    <LazyRoute>
+                      <LazyAnalytics />
+                    </LazyRoute>
+                  } />
+                  <Route path="/about" element={
+                    <LazyRoute>
+                      <LazyAbout />
+                    </LazyRoute>
+                  } />
+                  <Route path="/terms" element={
+                    <LazyRoute>
+                      <LazyTerms />
+                    </LazyRoute>
+                  } />
+                  <Route path="/privacy" element={
+                    <LazyRoute>
+                      <LazyPrivacy />
+                    </LazyRoute>
+                  } />
+                  <Route path="/contact" element={
+                    <LazyRoute>
+                      <LazyContact />
+                    </LazyRoute>
+                  } />
+                  <Route path="*" element={
+                    <LazyRoute>
+                      <LazyNotFound />
+                    </LazyRoute>
+                  } />
+                </Routes>
+              </ErrorBoundary>
+            </div>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
